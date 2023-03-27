@@ -1,0 +1,44 @@
+{
+	"name": "inventory",
+	"description": "Get the inventory of a user",
+	"options": {
+		"user": {
+			"name": "user",
+			"description": "Get the inventory of the specified Discord User"
+		},
+		"id": {
+			"name": "id",
+			"description": "Get the inventory of the specified User ID  or Ronin Address"
+		}
+	},
+	"title": "{{- playerName}}'s Inventory",
+	"labels": {
+		"charms": "Charms",
+		"runes": "Runes",
+		"mintable": "Mintable",
+		"upcoming_mintable": "Upcoming Mintable",
+		"season": "Season {{seasonId}}",
+		"common": "Common",
+		"rare": "Rare",
+		"epic": "Epic",
+		"mystic": "Mystic",
+		"Aquatic": "Aquatic",
+		"Beast": "Beast",
+		"Bird": "Bird",
+		"Bug": "Bug",
+		"Plant": "Plant",
+		"Reptile": "Reptile",
+		"Mech": "Mech",
+		"Dawn": "Dawn",
+		"Dusk": "Dusk",
+		"Neutral": "Neutral",
+		"placeholder": "Select Filters..."
+	},
+	"errors": {
+		"no_items": "❌ No items were returned. Please refine your filters.",
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Couldn't retrieve user inventory."
+		}
+	}
+}

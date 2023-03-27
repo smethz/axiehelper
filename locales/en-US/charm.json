@@ -1,0 +1,33 @@
+{
+    "name": "charm",
+    "description": "Shows the information of the specified Charm",
+    "options": {
+        "name": {
+            "name": "name",
+            "description": "Name of the charm"
+        }
+    },
+    "menu_placeholder": "Select Charm...",
+    "charm_found": {
+        "title": "Found {{numOfCharms}} Matches",
+        "description": "Select the charm that you are looking for"
+    },
+    "fields": {
+        "effect": "Effect",
+        "origins_availability": "Origins Availability",
+        "not_applicable": "N/A",
+        "rarity": "Rarity",
+        "potential_points": "Potential Points",
+        "minimum_price": "Minimum Price"
+    },
+    "errors": {
+        "not_found": {
+            "title": "No Charms Found",
+            "description": "I searched far and wide and found nothing matching your description.\nMake sure the charm you are looking for exists and spelled correctly."
+        },
+        "name_too_short": {
+            "title": "Name provided is too short",
+            "description": "You need to be more precise than that."
+        }
+    }
+}

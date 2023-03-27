@@ -1,0 +1,24 @@
+{
+	"name": "rankings",
+	"description": "Axie Infinity Global Leaderboard for current season",
+	"options": {
+		"rank": {
+			"name": "rank",
+			"description": "The leaderboard rank to get"
+		}
+	},
+	"leaderboard": "Axie Infinity Leaderboard",
+	"timestamp": "**Ends** <t:{{time}}:R>",
+	"timestamp_ended": "**Ended** <t:{{time}}:R>",
+	"error": "Couldn't fetch the leaderboard. Please try again later.",
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Couldn't retrieve the leaderboard. Please try again later"
+		},
+		"no_players": {
+			"title": "No Players",
+			"description": "There's no players to show in the leadeboard."
+		}
+	}
+}

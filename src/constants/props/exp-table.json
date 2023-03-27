@@ -1,0 +1,502 @@
+[
+	{
+		"level": 1,
+		"exp": 0,
+		"moonshards": 0
+	},
+	{
+		"level": 2,
+		"exp": 50,
+		"moonshards": 500
+	},
+	{
+		"level": 3,
+		"exp": 100,
+		"moonshards": 1000
+	},
+	{
+		"level": 4,
+		"exp": 150,
+		"moonshards": 1500
+	},
+	{
+		"level": 5,
+		"exp": 200,
+		"moonshards": 2000
+	},
+	{
+		"level": 6,
+		"exp": 300,
+		"moonshards": 3000
+	},
+	{
+		"level": 7,
+		"exp": 400,
+		"moonshards": 4000
+	},
+	{
+		"level": 8,
+		"exp": 500,
+		"moonshards": 5000
+	},
+	{
+		"level": 9,
+		"exp": 600,
+		"moonshards": 6000
+	},
+	{
+		"level": 10,
+		"exp": 700,
+		"moonshards": 7000
+	},
+	{
+		"level": 11,
+		"exp": 850,
+		"moonshards": 8500
+	},
+	{
+		"level": 12,
+		"exp": 1000,
+		"moonshards": 10000
+	},
+	{
+		"level": 13,
+		"exp": 1150,
+		"moonshards": 11500
+	},
+	{
+		"level": 14,
+		"exp": 1300,
+		"moonshards": 13000
+	},
+	{
+		"level": 15,
+		"exp": 1450,
+		"moonshards": 14500
+	},
+	{
+		"level": 16,
+		"exp": 1600,
+		"moonshards": 16000
+	},
+	{
+		"level": 17,
+		"exp": 1750,
+		"moonshards": 17500
+	},
+	{
+		"level": 18,
+		"exp": 1900,
+		"moonshards": 19000
+	},
+	{
+		"level": 19,
+		"exp": 2050,
+		"moonshards": 20500
+	},
+	{
+		"level": 20,
+		"exp": 2200,
+		"moonshards": 22000
+	},
+	{
+		"level": 21,
+		"exp": 2350,
+		"moonshards": 23500
+	},
+	{
+		"level": 22,
+		"exp": 2500,
+		"moonshards": 25000
+	},
+	{
+		"level": 23,
+		"exp": 2700,
+		"moonshards": 27000
+	},
+	{
+		"level": 24,
+		"exp": 2900,
+		"moonshards": 29000
+	},
+	{
+		"level": 25,
+		"exp": 3100,
+		"moonshards": 31000
+	},
+	{
+		"level": 26,
+		"exp": 3300,
+		"moonshards": 33000
+	},
+	{
+		"level": 27,
+		"exp": 3500,
+		"moonshards": 35000
+	},
+	{
+		"level": 28,
+		"exp": 3700,
+		"moonshards": 37000
+	},
+	{
+		"level": 29,
+		"exp": 3900,
+		"moonshards": 39000
+	},
+	{
+		"level": 30,
+		"exp": 4100,
+		"moonshards": 41000
+	},
+	{
+		"level": 31,
+		"exp": 4300,
+		"moonshards": 43000
+	},
+	{
+		"level": 32,
+		"exp": 4500,
+		"moonshards": 45000
+	},
+	{
+		"level": 33,
+		"exp": 4750,
+		"moonshards": 47500
+	},
+	{
+		"level": 34,
+		"exp": 5000,
+		"moonshards": 50000
+	},
+	{
+		"level": 35,
+		"exp": 5250,
+		"moonshards": 52500
+	},
+	{
+		"level": 36,
+		"exp": 5500,
+		"moonshards": 55000
+	},
+	{
+		"level": 37,
+		"exp": 5750,
+		"moonshards": 57500
+	},
+	{
+		"level": 38,
+		"exp": 6000,
+		"moonshards": 60000
+	},
+	{
+		"level": 39,
+		"exp": 6250,
+		"moonshards": 62500
+	},
+	{
+		"level": 40,
+		"exp": 6500,
+		"moonshards": 65000
+	},
+	{
+		"level": 41,
+		"exp": 6750,
+		"moonshards": 67500
+	},
+	{
+		"level": 42,
+		"exp": 7000,
+		"moonshards": 70000
+	},
+	{
+		"level": 43,
+		"exp": 7300,
+		"moonshards": 73000
+	},
+	{
+		"level": 44,
+		"exp": 7600,
+		"moonshards": 76000
+	},
+	{
+		"level": 45,
+		"exp": 7900,
+		"moonshards": 79000
+	},
+	{
+		"level": 46,
+		"exp": 8200,
+		"moonshards": 82000
+	},
+	{
+		"level": 47,
+		"exp": 8500,
+		"moonshards": 85000
+	},
+	{
+		"level": 48,
+		"exp": 8800,
+		"moonshards": 88000
+	},
+	{
+		"level": 49,
+		"exp": 9100,
+		"moonshards": 91000
+	},
+	{
+		"level": 50,
+		"exp": 9400,
+		"moonshards": 94000
+	},
+	{
+		"level": 51,
+		"exp": 9700,
+		"moonshards": 97000
+	},
+	{
+		"level": 52,
+		"exp": 10000,
+		"moonshards": 100000
+	},
+	{
+		"level": 53,
+		"exp": 10350,
+		"moonshards": 103500
+	},
+	{
+		"level": 54,
+		"exp": 10700,
+		"moonshards": 107000
+	},
+	{
+		"level": 55,
+		"exp": 11050,
+		"moonshards": 110500
+	},
+	{
+		"level": 56,
+		"exp": 11400,
+		"moonshards": 114000
+	},
+	{
+		"level": 57,
+		"exp": 11750,
+		"moonshards": 117500
+	},
+	{
+		"level": 58,
+		"exp": 12100,
+		"moonshards": 121000
+	},
+	{
+		"level": 59,
+		"exp": 12450,
+		"moonshards": 124500
+	},
+	{
+		"level": 60,
+		"exp": 12800,
+		"moonshards": 128000
+	},
+	{
+		"level": 61,
+		"exp": 13150,
+		"moonshards": 131500
+	},
+	{
+		"level": 62,
+		"exp": 13500,
+		"moonshards": 135000
+	},
+	{
+		"level": 63,
+		"exp": 13900,
+		"moonshards": 139000
+	},
+	{
+		"level": 64,
+		"exp": 14300,
+		"moonshards": 143000
+	},
+	{
+		"level": 65,
+		"exp": 14700,
+		"moonshards": 147000
+	},
+	{
+		"level": 66,
+		"exp": 15100,
+		"moonshards": 151000
+	},
+	{
+		"level": 67,
+		"exp": 15500,
+		"moonshards": 155000
+	},
+	{
+		"level": 68,
+		"exp": 15900,
+		"moonshards": 159000
+	},
+	{
+		"level": 69,
+		"exp": 16300,
+		"moonshards": 163000
+	},
+	{
+		"level": 70,
+		"exp": 16700,
+		"moonshards": 167000
+	},
+	{
+		"level": 71,
+		"exp": 17100,
+		"moonshards": 171000
+	},
+	{
+		"level": 72,
+		"exp": 17500,
+		"moonshards": 175000
+	},
+	{
+		"level": 73,
+		"exp": 17950,
+		"moonshards": 179500
+	},
+	{
+		"level": 74,
+		"exp": 18400,
+		"moonshards": 184000
+	},
+	{
+		"level": 75,
+		"exp": 18850,
+		"moonshards": 188500
+	},
+	{
+		"level": 76,
+		"exp": 19300,
+		"moonshards": 193000
+	},
+	{
+		"level": 77,
+		"exp": 19750,
+		"moonshards": 197500
+	},
+	{
+		"level": 78,
+		"exp": 20200,
+		"moonshards": 202000
+	},
+	{
+		"level": 79,
+		"exp": 20650,
+		"moonshards": 206500
+	},
+	{
+		"level": 80,
+		"exp": 21100,
+		"moonshards": 211000
+	},
+	{
+		"level": 81,
+		"exp": 21550,
+		"moonshards": 215500
+	},
+	{
+		"level": 82,
+		"exp": 22000,
+		"moonshards": 220000
+	},
+	{
+		"level": 83,
+		"exp": 22500,
+		"moonshards": 225000
+	},
+	{
+		"level": 84,
+		"exp": 23000,
+		"moonshards": 230000
+	},
+	{
+		"level": 85,
+		"exp": 23500,
+		"moonshards": 235000
+	},
+	{
+		"level": 86,
+		"exp": 24000,
+		"moonshards": 240000
+	},
+	{
+		"level": 87,
+		"exp": 24500,
+		"moonshards": 245000
+	},
+	{
+		"level": 88,
+		"exp": 25000,
+		"moonshards": 250000
+	},
+	{
+		"level": 89,
+		"exp": 25500,
+		"moonshards": 255000
+	},
+	{
+		"level": 90,
+		"exp": 26000,
+		"moonshards": 260000
+	},
+	{
+		"level": 91,
+		"exp": 26500,
+		"moonshards": 265000
+	},
+	{
+		"level": 92,
+		"exp": 27000,
+		"moonshards": 270000
+	},
+	{
+		"level": 93,
+		"exp": 27600,
+		"moonshards": 276000
+	},
+	{
+		"level": 94,
+		"exp": 28200,
+		"moonshards": 282000
+	},
+	{
+		"level": 95,
+		"exp": 28800,
+		"moonshards": 288000
+	},
+	{
+		"level": 96,
+		"exp": 29400,
+		"moonshards": 294000
+	},
+	{
+		"level": 97,
+		"exp": 30000,
+		"moonshards": 300000
+	},
+	{
+		"level": 98,
+		"exp": 30600,
+		"moonshards": 306000
+	},
+	{
+		"level": 99,
+		"exp": 31200,
+		"moonshards": 312000
+	},
+	{
+		"level": 100,
+		"exp": 31800,
+		"moonshards": 318000
+	}
+]

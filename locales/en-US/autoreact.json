@@ -1,0 +1,32 @@
+{
+	"name": "autoreact",
+	"description": "Disable or enable auto react on a message for this server",
+	"options": {
+		"keyword": {
+			"name": "keyword",
+			"description": "Select the keyword to auto react to messages",
+			"choices": {
+				"axie": "Axie",
+				"axs": "AXS",
+				"marketplace": "Marketplace",
+				"ronin": "Ronin",
+				"slp": "SLP"
+			}
+		}
+	},
+	"keyword": {
+		"disabled": "❌ Disabled `{{keyword}}` keyword to auto react to messages"
+	},
+	"success": {
+		"enabled": {
+			"title": "Keyword Enabled",
+			"description": "✅ Enabled `{{keyword}}` keyword to auto react to messages\nTry it out by saying \"{{keyword}}\""
+		}
+	},
+	"errors": {
+		"failed": {
+			"title": "An Error Occured",
+			"description": "❌ Couldn't toggle the specified keyword"
+		}
+	}
+}

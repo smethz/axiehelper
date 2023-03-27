@@ -1,0 +1,71 @@
+{
+	"name": "manage-leaderboard",
+	"description": "Manage the Guild's Leaderboard",
+	"action": {
+		"title": "Manage the Guild's Leaderboard",
+		"description": "**Add** - Add players to the leaderboard\n**Remove** - Remove players from the leaderboard\n**Reset** - Resets the leaderboard",
+		"footer": "{{leaderboardPlayers}} / {{maxLeaderboardPlayers}} Players in Leaderboard"
+	},
+	"reset_confirmation": {
+		"title": "Confirm to Reset",
+		"description": "Are you sure you want to reset the guild's leaderboard?"
+	},
+	"remove_prompt": {
+		"title": "Provide the Ronin Address or User ID to Remove",
+		"description": "**Type the Ronin Addresses or User IDs that you would like to remove**\n**Remove multiple players by seperating the IDs with new line or space**\n\nType `cancel` to cancel the process\n\n**Example:**"
+	},
+	"add_prompt": {
+		"title": "Provide the Ronin Address or User ID to Add",
+		"description": "**Type the Ronin Addresses or User IDs that you would like to add**\n**Add multiple players by seperating the IDs with new line or space**\n\nType `cancel` to cancel the process\n\n**Example:**"
+	},
+	"process": {
+		"title": "Processing...",
+		"description": "Please wait while I process your request"
+	},
+	"labels": {
+		"add": "Add",
+		"remove": "Remove",
+		"reset": "Reset",
+		"cancel": "Cancel",
+		"confirm": "Confirm"
+	},
+	"ids_provided": "IDs Provided",
+	"valid_format": "Valid Format",
+	"invalid_format": "Invalid Format",
+	"duplicates": "Duplicates",
+	"invalid_profile": "Invalid Player Profile",
+	"already_added": "Already in the Leaderboard",
+	"invalid_list": "List of Invalids:",
+	"success": {
+		"add": {
+			"title": "{{numOfPlayers}} Players Added to the Leaderboard"
+		},
+		"reset": {
+			"title": "Guild's Leaderboard has been Reset",
+			"description": "Successfully removed all players in the leaderboard."
+		},
+		"remove": {
+			"title": "{{playersToRemove}} Players Removed from the Leaderboard",
+			"description": "{{numOfIDs}} IDs Provided\n{{numOfIDsRemoved}} Players Removed"
+		}
+	},
+	"errors": {
+		"cancel": {
+			"title": "Process Cancelled",
+			"description": "You cancelled the process."
+		},
+		"timeout": {
+			"title": "Process Cancelled",
+			"description": "You didn't respond on time."
+		},
+		"limit_exceeded": {
+			"title": "Maximum Limit Exceeded",
+			"description": "You can't add more than **{{numOfPlayers}} players** to the leaderbaord",
+			"footer": "{{numOfMaxPlayers}} players is the limit on the leaderboard"
+		},
+		"no_id_provided": {
+			"title": "No Ronin Address or User ID Provided",
+			"description": "You need to provide at least one Ronin Address or User ID"
+		}
+	}
+}

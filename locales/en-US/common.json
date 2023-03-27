@@ -1,0 +1,47 @@
+{
+	"pagination": {
+		"footer": "Page {{currentPage}} of {{numOfPages}}"
+	},
+	"runes": "Runes",
+	"charms": "Charms",
+	"rarity": {
+		"common": "Common",
+		"rare": "Rare",
+		"epic": "Epic",
+		"mystic": "Mystic"
+	},
+	"errors": {
+		"execution_failed": {
+			"title": "Command Failed",
+			"description": "An error occured while excuting `{{commandName}}` command!"
+		},
+		"no_profile": {
+			"title": "No Profile Available",
+			"description": {
+				"self": "You don't have any saved profiles to execute this command",
+				"others": "User doesn't have any saved profiles to execute this command"
+			}
+		},
+		"invalid_address": {
+			"title": "Invalid Ronin Address Provided",
+			"description": "Please provide a **Valid Ronin Address**"
+		},
+		"invalid_id": {
+			"title": "Invalid User ID Provided",
+			"description": "Please provide a **Valid User ID**"
+		},
+		"invalid_format": {
+			"title": "Invalid User ID or Ronin Address Format",
+			"description": "Please provide a **Valid User ID** or **Ronin Address** format."
+		},
+		"invalid_profile": {
+			"title": "Invalid User ID or Ronin Address Provided",
+			"description": "The User ID or Ronin Address provided doesn't have a valid profile."
+		},
+		"missing_perms": {
+			"title": "Missing Permissions",
+			"description": "I don't have enough permissions to execute this command\nMissing Permission(s): `{{- missingPerms}}`"
+		},
+		"unauthorized_interaction": "You don't have permission to interact to this message.\nYou must execute the command on your own."
+	}
+}

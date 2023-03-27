@@ -1,0 +1,44 @@
+{
+	"name": "bind",
+	"description": "Bind a profile to your account.",
+	"account": "Account",
+	"modal": {
+		"title": "Bind New Profile",
+		"id_input": {
+			"label": "User ID or Ronin Address (REQUIRED)",
+			"placeholder": "1ec9eb6f-4d26-... OR ronin:abcdef..."
+		},
+		"name_input": {
+			"label": "Name (OPTIONAL)",
+			"placeholder": "Set a custom name"
+		}
+	},
+	"success": {
+		"added": {
+			"title": "Added New Profile",
+			"description": "You added `{{- userId}}` to your account\nName: {{- name}}"
+		}
+	},
+	"errors": {
+		"unexpected_error": {
+			"title": "An Error Occured",
+			"description": "An unexpected error occured while saving the profile"
+		},
+		"invalid_id": {
+			"title": "Invalid User ID or Ronin Address Provided",
+			"description": "Please provide a **Valid User ID or Ronin Address**"
+		},
+		"profile_not_retrieved": {
+			"title": "Failed to Retrieve Profile",
+			"description": "Failed to retrieve profile details for the given User ID."
+		},
+		"max_limit_reached": {
+			"title": "Maximum Profile Limit Reached",
+			"description": "You can't add any more profile to your account.\nPlease unbind a profile from your account first."
+		},
+		"already_added": {
+			"title": "Profile Already Added",
+			"description": "The profile you provided is already saved in your account."
+		}
+	}
+}

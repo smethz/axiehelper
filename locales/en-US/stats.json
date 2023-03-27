@@ -1,0 +1,32 @@
+{
+	"name": "stats",
+	"description": "get the stats of a user",
+	"options": {
+		"user": {
+			"name": "user",
+			"description": "Specify the User"
+		},
+		"id": {
+			"name": "id",
+			"description": "Specify the User ID or Ronin Address"
+		},
+		"currency": {
+			"name": "currency",
+			"description": "Choose the currency to display. Leave empty for user's preferred currency"
+		}
+	},
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Couldn't retrieve player stats."
+		}
+	},
+	"level": "Level",
+	"last_played_timestamp": "Last played {{- timestamp}}",
+	"rank_field": "⚔ Rank",
+	"crafting_field": "⚒️ Crafting Level",
+	"stamina_field": "⚡ Stamina",
+	"wins_field": "🟢 Wins",
+	"draws_field": "⚪ Draws",
+	"losses_field": "🔴 Losses"
+}

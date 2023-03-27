@@ -1,0 +1,67 @@
+datasource db {
+    url               = env("DATABASE_URL")
+    provider          = "postgresql"
+    shadowDatabaseUrl = env("SHADOW_DATABSE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+// Discord Server
+model Guild {
+    id          String          @id @unique
+    leaderboard PlayerProfile[]
+    settings    GuildSettings?
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+}
+
+model GuildSettings {
+    id         String   @id @unique
+    autoreacts String[]
+    guild      Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+    guildId    String   @unique
+}
+
+// Discord User
+model User {
+    id            String         @id @unique // Discord User ID
+    savedProfiles SavedProfile[]
+    settings      UserSettings?
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+}
+
+model UserSettings {
+    id       String @id @default(uuid())
+    currency String
+    language String
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId   String @unique
+}
+
+// In-game player
+model PlayerProfile {
+    id             String         @id @unique // In-Game User ID
+    name           String
+    roninAddress   String         @unique
+    historicalData Json?
+    savedProfiles  SavedProfile[]
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    guild          Guild[]
+
+    @@index([roninAddress])
+}
+
+// Discord User Saved Profiles
+model SavedProfile {
+    id              String        @id @unique // In-Game User ID
+    sharePercentage Int?          @default(0)
+    customName      String?
+    user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId          String
+    profile         PlayerProfile @relation(fields: [profileId], references: [id])
+    profileId       String        @unique
+}

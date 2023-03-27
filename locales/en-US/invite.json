@@ -1,0 +1,9 @@
+{
+	"name": "invite",
+	"description": "Generates a link you can use to invite the bot to your own server",
+	"invite_title": "Invite AxieHelper",
+	"labels": {
+		"add_bot": "Add Bot",
+		"support_server": "Support Server"
+	}
+}

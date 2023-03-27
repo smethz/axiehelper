@@ -1,0 +1,24 @@
+{
+	"name": "view",
+	"description": "View the lists of saved profiles in user's account",
+	"options": {
+		"user": {
+			"name": "user",
+			"description": "View other users saved accounts."
+		}
+	},
+	"profile_list": {
+		"self": "Your List of Saved Profiles",
+		"other": "{{- username}}'s List of Saved Profiles"
+	},
+	"footer": "{{numOfSavedProfiles}} / {{numOfMaxProfiles}} Saved Profiles",
+	"errors": {
+		"no_address": {
+			"title": "No Available Profiles to View",
+			"description": {
+				"self": "There's no available profile to view from your account",
+				"other": "There's no available profile to view from {{- username}}'s account"
+			}
+		}
+	}
+}

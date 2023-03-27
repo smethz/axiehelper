@@ -1,0 +1,25 @@
+{
+	"name": "card",
+	"description": "Shows the information of the specified Card",
+	"options": {
+		"name": {
+			"name": "name",
+			"description": "Name of the card"
+		}
+	},
+	"menu_placeholder": "Select Card...",
+	"card_found": {
+		"title": "Found {{numOfCards}} Matches",
+		"description": "Select the card that you are looking for"
+	},
+	"errors": {
+		"no_cards": {
+			"title": "No Cards Found",
+			"description": "I searched far and wide and found nothing matching your description.\nMake sure the card you are looking for exists and spelled correctly."
+		},
+		"name_too_short": {
+			"title": "Name provided is too short",
+			"description": "You need to be more precise than that."
+		}
+	}
+}

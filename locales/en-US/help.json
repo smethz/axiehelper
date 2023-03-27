@@ -1,0 +1,28 @@
+{
+	"name": "help",
+	"description": "Shows the list of all available commands",
+	"options": {
+		"command": {
+			"name": "command",
+			"description": "Shows detailed information of the command"
+		}
+	},
+	"commandName": "{{commandName}} command",
+	"info": "**Info**",
+	"labels": {
+		"all": "All Commands",
+		"account": "Account Commands",
+		"axie": "Axie Commands",
+		"crypto": "Crypto Commands",
+		"fun": "Fun Commands",
+		"info": "Info Commands",
+		"misc": "Misc Commands",
+		"mod": "Mod Commands"
+	},
+	"errors": {
+		"unknown_command": {
+			"title": "Unknown Command",
+			"description": "Sorry, that command doesn't exist."
+		}
+	}
+}

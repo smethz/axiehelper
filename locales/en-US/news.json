@@ -1,0 +1,10 @@
+{
+	"name": "news",
+	"description": "Shows the latest Lunacian News.",
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Failed to get the latest Lunacian News.\nPlease try again later."
+		}
+	}
+}

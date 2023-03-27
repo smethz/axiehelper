@@ -1,0 +1,62 @@
+{
+	"name": "battles",
+	"description": "Get the battle stats of a user",
+	"options": {
+		"user": {
+			"name": "user",
+			"description": "Get the battles of the specified Discord User"
+		},
+		"address": {
+			"name": "id",
+			"description": "Get the battles of the specified User ID or Ronin Address"
+		}
+	},
+	"friendly_pvp": "Friendly PVP",
+	"ranked_pvp": "Ranked PVP",
+	"practice_pvb": "Practice PVB",
+	"practice_pvp": "Practice PVP",
+	"blitz": "Blitz",
+	"unknown": "Unknown",
+	"placeholder": {
+		"select_battle": "Select Battle...",
+		"profile_retrieve": "Retrieving Battles..."
+	},
+	"watch_field": {
+		"name": "Watch Battle",
+		"value": "[📺 Watch](https://storage.googleapis.com/origin-production/origin.html?f=rpl&q={{battle_uuid}}&userId={{userId}})"
+	},
+	"results": {
+		"Victory": "Victory",
+		"Defeated": "Defeated",
+		"Draw": "Draw"
+	},
+	"result_field": {
+		"name": "Result",
+		"value": "**{{- result}}**"
+	},
+	"starter_name": "Starter {{starterId}}",
+	"opponent_field": "Opponent",
+	"player_team_field": "Player Team",
+	"opponent_team_field": "Opponent Team",
+	"rewards_field": "Rewards",
+	"wins": "🟢 Wins",
+	"draws": "⚪ Draws",
+	"losses": "🔴 Losses",
+	"total_battles": "Total Battles",
+	"most_used": "Most Used Team",
+	"last_used": "Last Used Team",
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Couldn't fetch user's recent arena battles.\nPlease try again later."
+		},
+		"no_recent_battles": {
+			"title": "No Recent Battles",
+			"description": "User has no recent arena battles available."
+		},
+		"no_profile": {
+			"title": "Request Failed",
+			"description": "Couldn't transform the Ronin Address to User ID"
+		}
+	}
+}

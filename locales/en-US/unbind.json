@@ -1,0 +1,40 @@
+{
+	"name": "unbind",
+	"description": "Unbind saved profiles from your account",
+	"selection-placeholder": "Select the profiles to remove",
+	"selected-placeholder": "Removed {{removedSize}} profiles",
+	"remove-button-label": "Remove",
+	"cancel-button-label": "Cancel",
+	"confirmation": {
+		"title": "Confirmation to Remove",
+		"description": "Are you sure you would like to delete `{{- profileId}}`?"
+	},
+	"select_address": {
+		"title": "Select Profiles to Remove",
+		"description": "Select the profiles that you would like to remove"
+	},
+	"success": {
+		"removed_selected": {
+			"title": "Removed Selected Profile",
+			"description": "The selected profile has been removed."
+		}
+	},
+	"errors": {
+		"no_address": {
+			"title": "No Profile Available",
+			"description": "You don't have any saved profiles to remove"
+		},
+		"timed_out": {
+			"title": "Process Timed Out",
+			"description": "You didn't respond on time."
+		},
+		"failed": {
+			"title": "Process Failed",
+			"description": "Failed to Remove Selected Profile."
+		},
+		"cancelled": {
+			"title": "Process Cancelled",
+			"description": "You cancelled the process."
+		}
+	}
+}

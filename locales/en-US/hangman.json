@@ -1,0 +1,27 @@
+{
+	"name": "hangman",
+	"description": "Starts a new hangman game",
+	"game": {
+		"start": {
+			"title": "A New Hangman Game Started!",
+			"description": "Type a letter or the whole answer to guess"
+		},
+		"end": {
+			"title": "Hangman Game Ended!",
+			"winner_user": "**{{- username}} got the correct answer!**",
+			"winner_none": "**No one got the correct answer!**"
+		},
+		"over": {
+			"title": "Game Over!",
+			"description": "**There was no letter {{guessedLetter}}!**"
+		},
+		"ongoing": {
+			"title": "Hangman Game Already Ongoing",
+			"description": "There's already an ongoing hangman game on this channel.\nType a letter or the correct answer to play."
+		}
+	},
+	"answer": "**The answer was __{{cardName}}__**",
+	"correctGuess": "**{{- username}} guessed letter {{guessedLetter}}!**",
+	"wrongGuess": "There's no letter {{guessedLetter}}!",
+	"cooldown": "{{- username}}, you can guess again in {{- timeLeft}} seconds"
+}

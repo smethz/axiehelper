@@ -1,0 +1,32 @@
+{
+    "name": "rune",
+    "description": "Shows the information of the specified Rune",
+    "options": {
+        "name": {
+            "name": "name",
+            "description": "Name of the rune"
+        }
+    },
+    "menu_placeholder": "Select Rune...",
+    "rune_found": {
+        "title": "Found {{numOfRunes}} Matches",
+        "description": "Select the rune that you are looking for"
+    },
+    "fields": {
+        "effect": "Effect",
+        "origins_availability": "Origins Availability",
+        "not_applicable": "N/A",
+        "rarity": "Rarity",
+        "minimum_price": "Minimum Price"
+    },
+    "errors": {
+        "not_found": {
+            "title": "No Runes Found",
+            "description": "I searched far and wide and found nothing matching your description.\nMake sure the rune you are looking for exists and spelled correctly."
+        },
+        "name_too_short": {
+            "title": "Name provided is too short",
+            "description": "You need to be more precise than that."
+        }
+    }
+}

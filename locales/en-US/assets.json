@@ -1,0 +1,24 @@
+{
+	"name": "assets",
+	"description": "Get the assets of a User",
+	"options": {
+		"user": {
+			"name": "user",
+			"description": "Get the assets of the specified Discord User"
+		},
+		"id": {
+			"name": "id",
+			"description": "Get the assets of the specified Ronin Address"
+		}
+	},
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Couldn't fetch user's assets. Please try again later"
+		},
+		"no_assets": {
+			"title": "No Assets Available",
+			"description": "User has no assets available."
+		}
+	}
+}

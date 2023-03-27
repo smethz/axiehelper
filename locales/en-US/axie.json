@@ -1,0 +1,37 @@
+{
+	"name": "axie",
+	"description": "Shows the information of the specified Axie",
+	"options": {
+		"id": {
+			"name": "id",
+			"description": "Axie ID Number"
+		}
+	},
+	"breed": {
+		"name": "Breed",
+		"value": "**Breed Count:** {{breedCount}}/7\n**Purity** {{purityCount}}/6\n**Quality:** {{qualityPercentage}}%"
+	},
+	"owner": {
+		"name": "Owner",
+		"value": "[{{ownerName}}]({{- ownerProfileUrl}})",
+		"default": "Owner's Profile"
+	},
+	"birthdate": {
+		"name": "Birthdate",
+		"value": "{{- birthDate}}"
+	},
+	"errors": {
+		"unsupported_chain": {
+			"title": "Axie on Unsupported Chain",
+			"description": "This Axie is on the Ethereum Network.\nThe Marketplace only supports Axies on Ronin Network."
+		},
+		"no_axie": {
+			"title": "Request Failed",
+			"description": "Couldn't retrieve Axie `{{axieId}}`"
+		},
+		"axie_egg": {
+			"title": "Retrieved an Egg",
+			"description": "Eggs are not currenctly supported."
+		}
+	}
+}

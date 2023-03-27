@@ -1,0 +1,33 @@
+{
+	"name": "guess",
+	"description": "Guess the answer for the question asked",
+	"options": {
+		"mode": {
+			"name": "mode",
+			"description": "Select the mode of questions",
+			"choices": {
+				"guessClass": "guess the class of the asked part",
+				"guessPart": "guess the number of parts that have the same class"
+			}
+		}
+	},
+	"one": "One",
+	"two": "Two",
+	"three": "Three",
+	"four": "Four",
+	"five": "Five",
+	"six": "Six",
+	"timedOut": "You didn't answered on time!",
+	"correctAnswer": "You got the correct answer!",
+	"wrongAnswer": "You got the wrong answer!",
+	"question": {
+		"class": "What is the class of the __{{partClass}}__?",
+		"part": "How many parts are __{{partClass}}__ class?"
+	},
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Failed to retrieve a random Axie"
+		}
+	}
+}

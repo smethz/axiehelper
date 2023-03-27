@@ -1,0 +1,53 @@
+{
+	"name": "stakes",
+	"description": "Get the staked tokens of a user",
+	"options": {
+		"user": {
+			"name": "user",
+			"description": "Get the stakes of the specified Discord User"
+		},
+		"id": {
+			"name": "id",
+			"description": "Get the stakes of the specified Ronin Address"
+		},
+		"token": {
+			"name": "token",
+			"description": "Choose the token to display",
+			"choices": {
+				"0": "AXS Staking",
+				"1": "RON-AXS Farming",
+				"2": "RON-SLP Farming",
+				"3": "RON-USDC Farming",
+				"4": "RON-WETH Farming"
+			}
+		},
+		"currency": {
+			"name": "currency",
+			"description": "Choose the currency to display. Leave empty for user's preferred currency"
+		}
+	},
+	"fields": {
+		"total_staked": "Total Staked",
+		"pending_rewards": "Pending Rewards",
+		"estimated_daily_rewards": "Estimated Daily Rewards",
+		"token_total_staked": "🔒 Total Staked",
+		"daily_rewards": "Daily Rewards",
+		"last_claimed": "Last Claimed",
+		"next_claim": "Next Claim",
+		"claimable": "Claimable",
+		"claim_now": "Claim Now"
+	},
+	"labels": {
+		"axs": "AXS Staking",
+		"ron-axs": "RON/AXS Farming",
+		"ron-slp": "RON/SLP Farming",
+		"ron-usdc": "RON/USDC Farming",
+		"ron-weth": "RON/weth Farming"
+	},
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "An unexpected error occured"
+		}
+	}
+}

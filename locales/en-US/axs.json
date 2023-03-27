@@ -1,0 +1,25 @@
+{
+	"name": "axs",
+	"description": "Get the current price of Axie Infinity Shards (AXS)",
+	"options": {
+		"currency": {
+			"name": "currency",
+			"description": "Choose the currency to use. Leave empty for user's preferred currency"
+		},
+		"amount": {
+			"name": "amount",
+			"description": "Amount to be multiplied with. (Current Price of AXS × Amount)"
+		}
+	},
+	"fields": {
+		"24h_change": "24H Change",
+		"24h_high": "24H High",
+		"24h_low": "24H Low"
+	},
+	"errors": {
+		"request_failed": {
+			"title": "Request Failed",
+			"description": "Couldn't fetch current AXS price. Please try again later."
+		}
+	}
+}

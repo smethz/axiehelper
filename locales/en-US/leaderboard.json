@@ -1,0 +1,17 @@
+{
+	"name": "leaderboard",
+	"description": "Guild's Custom Leaderboard",
+	"leaderboard_title": "{{guildName}}'s Leaderboard",
+	"labels": {
+		"vstars": "Victory Stars",
+		"rank": "Global Rank",
+		"stamina": "Stamina",
+		"crafting_level": "Crafting Level"
+	},
+	"errors": {
+		"empty_leaderboard": {
+			"title": "{{guildName}}'s Leaderboard",
+			"description": "No one is in the leaderboard.\nSetup the Guild's Leaderboard using `/manage-leaderboard` command"
+		}
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"name": "profile",
+	"description": "Shows the basic details of the given Ronin Address or User ID",
+	"options": {
+		"id": {
+			"name": "id",
+			"description": "Ronin Address or User ID"
+		}
+	},
+	"profile_title": "{{name}}'s Profile",
+	"ronin_address": "Ronin Address",
+	"user_id": "User ID",
+	"errors": {
+		"invalid_format": {
+			"title": "Invalid Ronin Address or User ID",
+			"description": "The ID you provided couldn't be determined\nPlease make sure you entered the correct format."
+		},
+		"no_profile": {
+			"title": "No Profile Details",
+			"description": "The ID you provided doesn't have a profile."
+		}
+	}
+}

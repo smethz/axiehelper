@@ -1,0 +1,6 @@
+{
+	"name": "ping",
+	"description": "Checks the Latency and API response times.",
+	"pinging": "Pinging...",
+	"pong": ":ping_pong: Pong! Took `{{latency}}ms` WebSocket Latency: `{{ping}}ms`"
+}

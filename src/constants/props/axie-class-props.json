@@ -1,0 +1,42 @@
+{
+	"plant": {
+		"color": "#6cc000",
+		"emoji": "<:Plant:959283850360524860>"
+	},
+	"reptile": {
+		"color": "#dc8be4",
+		"emoji": "<:Reptile:959283850272440320>"
+	},
+	"dusk": {
+		"color": "#129092",
+		"emoji": "<:Dusk:959283850306023424>"
+	},
+	"aquatic": {
+		"color": "#00b8ce",
+		"emoji": "<:Aquatic:959283850201157652>"
+	},
+	"bird": {
+		"color": "#ff8bbd",
+		"emoji": "<:Bird:959283850289221652>"
+	},
+	"dawn": {
+		"color": "#beceff",
+		"emoji": "<:Dawn:959283850230509579>"
+	},
+	"beast": {
+		"color": "#ffb812",
+		"emoji": "<:Beast:959283850205352009>"
+	},
+	"bug": {
+		"color": "#ff5341",
+		"emoji": "<:Bug:959283850322804826>"
+	},
+	"mech": {
+		"color": "#c6bdd4",
+		"emoji": "<:Mech:959283850188570635>"
+	},
+	"neutral": {
+		"color": "#7f7f7f",
+		"emoji": "<:Neutral:1083028531832963142>"
+	}
+}
