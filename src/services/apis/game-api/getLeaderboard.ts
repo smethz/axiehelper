@@ -18,32 +18,31 @@ interface APILeaderboardResponse {
 	_metadata: {
 		limit: number
 		offset: number
+		total: number
 		hasNext: boolean
 	}
 }
 
-export async function getLeaderboard({
-	limit = 100,
-	offset = 0,
-}: APILeadearboardParams): Promise<PlayerLeaderboardData[]> {
+export async function getLeaderboard({ limit, offset }: APILeadearboardParams): Promise<APILeaderboardResponse> {
 	const cacheKey = `leaderboard:${offset}`
 	const cachedEntry = await cache.get(cacheKey)
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
-	const leaderboardPlayers = await GameAPI.get<APILeaderboardResponse>(`/v2/leaderboards`, {
+	const arenaLeaderboard = await GameAPI.get<APILeaderboardResponse>(`/v2/leaderboards`, {
 		params: { limit, offset },
 	})
-		.then((response) => response.data._items)
+		.then((response) => response.data)
 		.catch((error: AxiosError) => logger.error(error))
 
-	if (!leaderboardPlayers) throw new Error("GameAPI Error: getLeaderboard")
+	if (!arenaLeaderboard) throw new Error("GameAPI Error: getLeaderboard")
 
-	leaderboardPlayers.forEach((player) => {
+	arenaLeaderboard._items.forEach((player) => {
 		player.rankIcon = emojis.rank[`${player.rank}_${player.tier}` as keyof typeof emojis.rank]
+		player.name = player.name.replaceAll(/\r?\n|\r/g, "").trim()
 		player.name = player.name.replace(/(\r\n|\r|\n)/, "")
 	})
 
-	await cache.set(cacheKey, JSON.stringify(leaderboardPlayers), "EX", DEFAULT_CACHE_EXPIRATION)
+	await cache.set(cacheKey, JSON.stringify(arenaLeaderboard), "EX", DEFAULT_CACHE_EXPIRATION)
 
-	return leaderboardPlayers
+	return arenaLeaderboard
 }

@@ -96,7 +96,6 @@ export async function getPageIndex(buttonInteraction: ButtonInteraction, pageInd
 			break
 		}
 		default: {
-			// Show Modal
 			const pageSelectModal = createPageSelectModal(maxPage)
 
 			await buttonInteraction.showModal(pageSelectModal)
@@ -107,6 +106,7 @@ export async function getPageIndex(buttonInteraction: ButtonInteraction, pageInd
 				})
 				.then(async (modalInteraction) => {
 					if (!modalInteraction.deferred) await modalInteraction.deferUpdate()
+
 					let pageInput = modalInteraction.fields.getTextInputValue("pageInput")
 
 					const rawPageIndex = parseInt(pageInput)

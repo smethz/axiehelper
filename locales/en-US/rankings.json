@@ -2,9 +2,25 @@
 	"name": "rankings",
 	"description": "Axie Infinity Global Leaderboard for current season",
 	"options": {
-		"rank": {
-			"name": "rank",
-			"description": "The leaderboard rank to get"
+		"arena": {
+			"name": "arena",
+			"description": "Global Rankings for the Current Season",
+			"options": {
+				"rank": {
+					"name": "rank",
+					"description": "The leaderboard rank to get"
+				}
+			}
+		},
+		"event": {
+			"name": "arena",
+			"description": "Get the rankings for the Latest Event",
+			"options": {
+				"rank": {
+					"name": "rank",
+					"description": "The leaderboard rank to get"
+				}
+			}
 		}
 	},
 	"leaderboard": "Axie Infinity Leaderboard",

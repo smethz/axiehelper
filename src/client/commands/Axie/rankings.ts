@@ -1,3 +1,4 @@
+import { getContest } from "@apis/contest-api/getContest"
 import { getContestLeaderboard } from "@apis/contest-api/getContestLeaderboard"
 import { getLeaderboard } from "@apis/game-api/getLeaderboard"
 import { createErrorEmbed } from "@client/components/embeds"
@@ -5,13 +6,15 @@ import {
 	createPages,
 	createPaginationButtons,
 	getFooter,
+	getPageFromOffset,
 	getPageIndex,
-	handlePagination,
 } from "@client/components/pagination"
 import { DEFAULT_IDLE_TIME } from "@constants/index"
 import emojis from "@constants/props/emojis.json"
 import { AXIES_IO_URL } from "@constants/url"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
+import { ContestPlayer } from "@custom-types/contest"
+import { PlayerLeaderboardData } from "@custom-types/profile"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents } from "@utils/componentsToggler"
 import { numberFormatter } from "@utils/currencyFormatter"
@@ -39,6 +42,14 @@ const command: SlashCommand = {
 				type: ApplicationCommandOptionType.Subcommand,
 				name: "event",
 				description: "Get the rankings for the Latest Event",
+				options: [
+					{
+						type: ApplicationCommandOptionType.Integer,
+						name: "rank",
+						description: "The leaderboard rank to get",
+						required: false,
+					},
+				],
 			},
 		],
 	},
@@ -53,7 +64,10 @@ const command: SlashCommand = {
 async function execute({ interaction, translate }: CommandExecuteParams): Promise<void> {
 	await interaction.deferReply()
 
+	const numOfPlayersPerPage = 20
 	const isArena = interaction.options.getSubcommand(true) === "arena"
+	const rankInput = interaction.options.getInteger("rank")
+	const leaderboardPage = getPageFromOffset(rankInput, numOfPlayersPerPage)
 
 	const requestFailedEmbed = createErrorEmbed({
 		title: translate("errors.request_failed.title"),
@@ -67,36 +81,30 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	// Arena Leaderboard
 	if (isArena) {
-		const rankOffset = interaction.options.getInteger("rank") || 0
-		const leaderboardPlayers = await getLeaderboard({ offset: rankOffset })
+		let arenaLeaderboard = await getLeaderboard({ offset: (leaderboardPage - 1) * 20, limit: numOfPlayersPerPage })
 
-		if (!leaderboardPlayers) {
+		if (!arenaLeaderboard) {
 			await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
 			return
 		}
 
-		if (!leaderboardPlayers.length) {
+		if (!arenaLeaderboard._items.length) {
 			await interaction.editReply({ embeds: [noPlayersEmbed] }).catch(() => {})
 			return
 		}
 
-		const parsedLeaderboard = leaderboardPlayers
-			.map((player) => {
-				return `${player.rankIcon} ${numberFormatter(player.topRank)}. **${numberFormatter(player.vstar)}** ${
-					emojis.victory_star
-				} — [${player.name}](${AXIES_IO_URL}/profile/${player.userID})`
-			})
-			.join("\n")
+		let parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
 
-		let pageIndex = 0
+		let maxPage = Math.floor(arenaLeaderboard._metadata.total / numOfPlayersPerPage) || 1
+		let pageIndex = leaderboardPage - 1
 		let pages = createPages(parsedLeaderboard)
-		const paginationButtons = createPaginationButtons(pageIndex, pages)
+		let paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
 
-		const rankingsEmbed = new EmbedBuilder()
+		let rankingsEmbed = new EmbedBuilder()
 			.setTitle(translate("leaderboard"))
 			.setURL(`${AXIES_IO_URL}/leaderboard`)
-			.setDescription(pages[pageIndex] as string)
-			.setFooter({ text: getFooter(pageIndex, pages, interaction.locale) })
+			.setDescription(pages[0] as string)
+			.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
 			.setColor("Random")
 
 		const leaderboardMessage = await interaction.editReply({
@@ -104,7 +112,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			components: [paginationButtons],
 		})
 
-		if (pages.length <= 1) return
+		if (maxPage <= 1) return
 
 		const collector = leaderboardMessage.createMessageComponentCollector<ComponentType.Button>({
 			idle: DEFAULT_IDLE_TIME,
@@ -112,9 +120,24 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		})
 
 		collector.on("collect", async (buttonInteraction) => {
-			pageIndex = getPageIndex(pageIndex, pages, buttonInteraction.customId)
+			pageIndex = await getPageIndex(buttonInteraction, pageIndex, maxPage)
 
-			handlePagination(buttonInteraction, paginationButtons, leaderboardMessage, pages, pageIndex)
+			disableComponents(paginationButtons)
+			await buttonInteraction.editReply({ components: [paginationButtons] }).catch(() => {})
+
+			arenaLeaderboard = await getLeaderboard({ offset: pageIndex * 20 })
+
+			parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
+			pages = createPages(parsedLeaderboard)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
+
+			rankingsEmbed
+				.setDescription(pages[0] as string)
+				.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
+				.setTimestamp()
+				.setColor("Random")
+
+			await buttonInteraction.editReply({ embeds: [rankingsEmbed], components: [paginationButtons] }).catch(() => {})
 		})
 
 		collector.on("end", () => {
@@ -127,7 +150,18 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	}
 
 	// Event Leaderboard
-	const contestLeaderboard = await getContestLeaderboard()
+	const constestList = await getContest()
+	let latestContest = constestList[0]
+	if (!latestContest) {
+		await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
+		return
+	}
+
+	let contestLeaderboard = await getContestLeaderboard({
+		constestId: latestContest.id,
+		limit: numOfPlayersPerPage,
+		page: leaderboardPage,
+	})
 
 	if (!contestLeaderboard) {
 		await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
@@ -139,30 +173,26 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	const parsedLeaderboard = contestLeaderboard.players
-		.map((player) => {
-			return `${player.rank}. **${numberFormatter(player.total_point)}** pts — [${
-				player.user_name
-			}](https://axies.io/profile/${player.user_id})`
-		})
-		.join("\n")
+	let parsedLeaderboard = parseContestPage(contestLeaderboard.players)
 
-	const isContestEnded = contestLeaderboard.contest.end_time < Date.now() / 1000
+	const isContestEnded = latestContest!.end_time < Date.now() / 1000
+
 	let timestamp = translate("timestamp", {
 		context: isContestEnded ? "ended" : "",
-		time: contestLeaderboard.contest.end_time,
+		time: latestContest.end_time,
 	})
 
-	let pageIndex = 0
+	let maxPage = Math.floor(contestLeaderboard.total / numOfPlayersPerPage) || 1
+	let pageIndex = leaderboardPage - 1
 	let pages = createPages(parsedLeaderboard)
-	let paginationButtons = createPaginationButtons(pageIndex, pages)
+	let paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
 
 	const contestEmbed = new EmbedBuilder()
-		.setTitle(contestLeaderboard.contest.name)
-		.setURL(contestLeaderboard.contest.event_url)
-		.setDescription(`${timestamp}\n`.concat(pages[pageIndex] as string))
-		.setThumbnail(contestLeaderboard.contest.mobile_image_url)
-		.setFooter({ text: getFooter(pageIndex, pages, interaction.locale) })
+		.setTitle(latestContest.name)
+		.setURL(latestContest.event_url)
+		.setDescription(`${timestamp}\n`.concat(pages[0] as string))
+		.setThumbnail(latestContest.mobile_image_url)
+		.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
 		.setTimestamp()
 		.setColor("Random")
 
@@ -171,7 +201,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		components: [paginationButtons],
 	})
 
-	if (pages.length <= 1) return
+	if (maxPage <= 1) return
 
 	const collector = message.createMessageComponentCollector<ComponentType.Button>({
 		idle: DEFAULT_IDLE_TIME,
@@ -179,16 +209,39 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	})
 
 	collector.on("collect", async (buttonInteraction) => {
-		await buttonInteraction.deferUpdate()
-		pageIndex = getPageIndex(pageIndex, pages, buttonInteraction.customId)
+		pageIndex = await getPageIndex(buttonInteraction, pageIndex, maxPage)
 
-		contestEmbed.setDescription(`${timestamp}\n`.concat(pages[pageIndex] as string))
-		contestEmbed.setFooter({
-			text: getFooter(pageIndex, pages, buttonInteraction.locale),
+		disableComponents(paginationButtons)
+		await buttonInteraction.editReply({ components: [paginationButtons] }).catch(() => {})
+
+		contestLeaderboard = await getContestLeaderboard({
+			constestId: latestContest!.id,
+			limit: numOfPlayersPerPage,
+			page: pageIndex + 1,
 		})
-		contestEmbed.setColor("Random")
 
-		paginationButtons = createPaginationButtons(pageIndex, pages)
+		if (!contestLeaderboard) {
+			await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
+			return
+		}
+
+		if (!contestLeaderboard.players.length) {
+			await interaction.editReply({ embeds: [noPlayersEmbed] }).catch(() => {})
+			return
+		}
+
+		parsedLeaderboard = parseContestPage(contestLeaderboard.players)
+		pages = createPages(parsedLeaderboard)
+		paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
+
+		const contestEmbed = new EmbedBuilder()
+			.setTitle(latestContest!.name)
+			.setURL(latestContest!.event_url)
+			.setDescription(`${timestamp}\n`.concat(pages[0] as string))
+			.setThumbnail(latestContest!.mobile_image_url)
+			.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
+			.setTimestamp()
+			.setColor("Random")
 
 		await buttonInteraction.editReply({ embeds: [contestEmbed], components: [paginationButtons] }).catch(() => {})
 	})
@@ -198,6 +251,26 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		message.edit({ components: [paginationButtons] }).catch(() => {})
 	})
+}
+
+function parseArenaPage(players: PlayerLeaderboardData[]) {
+	return players
+		.map((player) => {
+			return `${player.rankIcon} ${numberFormatter(player.topRank)}. **${numberFormatter(player.vstar)}** ${
+				emojis.victory_star
+			} — [${player.name}](${AXIES_IO_URL}/profile/${player.userID})`
+		})
+		.join("\n")
+}
+
+function parseContestPage(players: ContestPlayer[]) {
+	return players
+		.map((player) => {
+			return `${player.rank}. **${numberFormatter(player.total_point)}** pts — [${
+				player.user_name
+			}](https://axies.io/profile/${player.user_id})`
+		})
+		.join("\n")
 }
 
 export default command
