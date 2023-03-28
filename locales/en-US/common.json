@@ -1,6 +1,7 @@
 {
 	"pagination": {
-		"footer": "Page {{currentPage}} of {{numOfPages}}"
+		"footer": "Page {{currentPage}} of {{numOfPages}}",
+		"invalid_page_number": "You provided an invalid page number. Please provided a valid number from 1-{{maxPage}}"
 	},
 	"runes": "Runes",
 	"charms": "Charms",

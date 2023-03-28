@@ -77,7 +77,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	let pageIndex = 0
 	let pages = createPages(parsedUserAddresses)
-	const paginationButtons = createPaginationButtons(pageIndex, pages)
+	const paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 	const viewEmbed = new EmbedBuilder()
 		.setAuthor({
@@ -104,7 +104,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	})
 
 	collector.on("collect", async (buttonInteraction) => {
-		pageIndex = getPageIndex(pageIndex, pages, buttonInteraction.customId)
+		pageIndex = await getPageIndex(buttonInteraction, pageIndex, pages.length)
 
 		handlePagination(buttonInteraction, paginationButtons, viewMessage, pages, pageIndex)
 	})

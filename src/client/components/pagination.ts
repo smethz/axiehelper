@@ -1,41 +1,74 @@
 import emojis from "@constants/props/emojis.json"
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, Message } from "discord.js"
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonInteraction,
+	ButtonStyle,
+	EmbedBuilder,
+	Message,
+	ModalActionRowComponentBuilder,
+	ModalBuilder,
+	TextInputBuilder,
+	TextInputStyle,
+} from "discord.js"
 import i18next from "i18next"
 import logger from "pino-logger"
 
-export function createPaginationButtons(pageIndex: number, pages: unknown[]) {
+export function createPaginationButtons({
+	pageIndex,
+	maxPage,
+	isDynamic,
+}: {
+	pageIndex: number
+	maxPage: number
+	isDynamic?: boolean
+}) {
 	const isFirst = pageIndex === 0
-	const isLast = pageIndex === pages.length - 1
+	const isLast = pageIndex === maxPage - 1
+	const isSinglePage = maxPage === 1
 	const disabledStyle = (disabled: boolean) => (disabled ? ButtonStyle.Secondary : ButtonStyle.Primary)
 
-	return new ActionRowBuilder<ButtonBuilder>({
-		components: [
+	const components = [
+		new ButtonBuilder({
+			style: disabledStyle(isFirst),
+			emoji: emojis.pagination.first,
+			customId: "first",
+			disabled: isFirst,
+		}),
+		new ButtonBuilder({
+			style: disabledStyle(isFirst),
+			emoji: emojis.pagination.previous,
+			customId: "previous",
+			disabled: isFirst,
+		}),
+		new ButtonBuilder({
+			style: disabledStyle(isLast),
+			emoji: emojis.pagination.next,
+			customId: "next",
+			disabled: isLast,
+		}),
+		new ButtonBuilder({
+			style: disabledStyle(isLast),
+			emoji: emojis.pagination.last,
+			customId: "last",
+			disabled: isLast,
+		}),
+	]
+
+	if (isDynamic) {
+		components.splice(
+			2,
+			0,
 			new ButtonBuilder({
-				style: disabledStyle(isFirst),
-				emoji: emojis.pagination.first,
-				customId: "first",
-				disabled: isFirst,
-			}),
-			new ButtonBuilder({
-				style: disabledStyle(isFirst),
-				emoji: emojis.pagination.previous,
-				customId: "previous",
-				disabled: isFirst,
-			}),
-			new ButtonBuilder({
-				style: disabledStyle(isLast),
-				emoji: emojis.pagination.next,
-				customId: "next",
-				disabled: isLast,
-			}),
-			new ButtonBuilder({
-				style: disabledStyle(isLast),
-				emoji: emojis.pagination.last,
-				customId: "last",
-				disabled: isLast,
-			}),
-		],
-	})
+				style: isSinglePage ? ButtonStyle.Secondary : ButtonStyle.Success,
+				emoji: emojis.pagination.jump,
+				customId: "page-jump",
+				disabled: isSinglePage,
+			})
+		)
+	}
+
+	return new ActionRowBuilder<ButtonBuilder>({ components })
 }
 
 export function createPages(items: string, itemsPerPage: number = 20) {
@@ -44,8 +77,8 @@ export function createPages(items: string, itemsPerPage: number = 20) {
 	return (items.match(NUM_OF_ITEMS_PER_PAGE_REGEX) as string[]) || []
 }
 
-export function getPageIndex(pageIndex: number, pages: string[], paginationAction: string) {
-	switch (paginationAction) {
+export async function getPageIndex(buttonInteraction: ButtonInteraction, pageIndex: number, maxPage: number) {
+	switch (buttonInteraction.customId) {
 		case "first": {
 			pageIndex = 0
 			break
@@ -55,13 +88,48 @@ export function getPageIndex(pageIndex: number, pages: string[], paginationActio
 			break
 		}
 		case "next": {
-			pageIndex = Math.min(pageIndex + 1, pages.length - 1)
+			pageIndex = Math.min(pageIndex + 1, maxPage)
 			break
 		}
 		case "last": {
-			pageIndex = pages.length - 1
+			pageIndex = maxPage - 1
 			break
 		}
+		default: {
+			// Show Modal
+			const pageSelectModal = createPageSelectModal(maxPage)
+
+			await buttonInteraction.showModal(pageSelectModal)
+
+			await buttonInteraction
+				.awaitModalSubmit({
+					time: 1000 * 60 * 15,
+				})
+				.then(async (modalInteraction) => {
+					if (!modalInteraction.deferred) await modalInteraction.deferUpdate()
+					let pageInput = modalInteraction.fields.getTextInputValue("pageInput")
+
+					const rawPageIndex = parseInt(pageInput)
+
+					if (isNaN(rawPageIndex) || rawPageIndex < 1 || rawPageIndex > maxPage) {
+						const invalidErrorMessage = i18next.t("pagination.invalid_page_number", {
+							maxPage,
+							ns: "common",
+							lng: buttonInteraction.locale,
+						})
+
+						await modalInteraction.followUp({ content: invalidErrorMessage, ephemeral: true })
+						return
+					}
+
+					pageIndex = rawPageIndex - 1
+				})
+				.catch(() => {})
+		}
+	}
+
+	if (buttonInteraction.customId !== "page-jump" && !buttonInteraction.deferred) {
+		await buttonInteraction.deferUpdate()
 	}
 
 	return pageIndex
@@ -84,7 +152,6 @@ export async function handlePagination(
 	pages: string[],
 	pageIndex: number
 ) {
-	await buttonInteraction.deferUpdate()
 	const embed = new EmbedBuilder(message.embeds[0]?.toJSON())
 
 	embed.setDescription(pages[pageIndex] as string)
@@ -93,18 +160,45 @@ export async function handlePagination(
 	})
 	embed.setColor("Random")
 
-	paginationControllerButtons = createPaginationButtons(pageIndex, pages)
+	paginationControllerButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 	await buttonInteraction
 		.editReply({ embeds: [embed], components: [paginationControllerButtons] })
 		.catch((error) => logger.error(error))
 }
 
-export function getFooter(pageIndex: number, pages: string[], locale: string) {
+export function getFooter(pageIndex: number, pages: string[] | number, locale: string) {
 	return i18next.t("pagination.footer", {
 		currentPage: pageIndex + 1,
-		numOfPages: pages.length,
+		numOfPages: Array.isArray(pages) ? pages.length : pages,
 		ns: "common",
 		lng: locale,
 	})
+}
+
+export function createPageSelectModal(maxPage: number) {
+	const modal = new ModalBuilder().setCustomId(`select-page`).setTitle("Jump to Page")
+
+	const pageInput = new TextInputBuilder()
+		.setCustomId("pageInput")
+		.setLabel("Page Number")
+		.setPlaceholder(`1 - ${maxPage}`)
+		.setMaxLength(maxPage.toString().length)
+		.setMinLength(1)
+		.setStyle(TextInputStyle.Short)
+		.setRequired(true)
+
+	const pageActionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(pageInput)
+
+	modal.addComponents(pageActionRow)
+
+	return modal
+}
+
+export function getPageFromOffset(offset: number | null, numOfItemsPerPage: number = 20) {
+	if (!offset) return 1
+
+	const pageNum = Math.ceil(offset / numOfItemsPerPage)
+
+	return Math.min(Math.max(pageNum, 1), pageNum || Infinity)
 }

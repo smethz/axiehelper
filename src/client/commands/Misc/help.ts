@@ -82,7 +82,7 @@ async function execute({ interaction, client, translate }: CommandExecuteParams)
 	// Show All Commands
 	let pageIndex = 0
 	let pages = getCategoryCommands("All", client.slashCommands)
-	let paginationButtons = createPaginationButtons(pageIndex, pages)
+	let paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 	const categoryMenuOptions = [
 		{
@@ -141,14 +141,14 @@ async function execute({ interaction, client, translate }: CommandExecuteParams)
 		await componentInteraction.deferUpdate()
 
 		if (componentInteraction.isButton()) {
-			pageIndex = getPageIndex(pageIndex, pages, componentInteraction.customId)
+			pageIndex = await getPageIndex(componentInteraction, pageIndex, pages.length)
 
 			commandEmbed
 				.setDescription(pages[pageIndex] as string)
 				.setFooter({ text: getFooter(pageIndex, pages, interaction.locale) })
 			commandEmbed.setColor("Random")
 
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			await componentInteraction
 				.editReply({
@@ -173,7 +173,7 @@ async function execute({ interaction, client, translate }: CommandExecuteParams)
 				text: getFooter(pageIndex, pages, interaction.locale),
 			})
 
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			await componentInteraction
 				.editReply({

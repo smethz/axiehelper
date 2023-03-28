@@ -124,7 +124,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	let pageIndex = 0
 	let pages = createPages(sortedPlayers)
-	let paginationButtons = createPaginationButtons(pageIndex, pages)
+	let paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 	const rankingsEmbed = new EmbedBuilder()
 		.setAuthor({
@@ -152,7 +152,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		// Handle Pagination
 		if (componentInteraction.isButton()) {
-			pageIndex = getPageIndex(pageIndex, pages, componentInteraction.customId)
+			pageIndex = await getPageIndex(componentInteraction, pageIndex, pages.length)
 
 			rankingsEmbed.setDescription(pages[pageIndex] as string)
 			rankingsEmbed.setFooter({
@@ -160,7 +160,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			})
 			rankingsEmbed.setColor("Random")
 
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			await componentInteraction
 				.editReply({
@@ -187,7 +187,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			sortedPlayers = sortLeaderboard(players, sortType)
 			pageIndex = 0
 			pages = createPages(sortedPlayers)
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			rankingsEmbed.setDescription(pages[pageIndex] as string)
 			rankingsEmbed.setFooter({

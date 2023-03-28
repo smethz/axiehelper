@@ -120,7 +120,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		let inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
 		let inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 
-		let paginationButtons = createPaginationButtons(pageIndex, pages)
+		let paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 		let filterMenu = createFilterMenu()
 
 		const message = await interaction.editReply({
@@ -140,14 +140,14 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			// Handle Pagination
 			if (componentInteraction.isButton()) {
-				pageIndex = getPageIndex(pageIndex, pages, componentInteraction.customId)
+				pageIndex = await getPageIndex(componentInteraction, pageIndex, pages.length)
 
 				inventoryEmbed
 					.setDescription(pages[pageIndex] as string)
 					.setFooter({ text: getFooter(pageIndex, pages, interaction.locale) })
 					.setColor("Random")
 
-				paginationButtons = createPaginationButtons(pageIndex, pages)
+				paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 				await componentInteraction
 					.editReply({
@@ -173,7 +173,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
 				inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 
-				paginationButtons = createPaginationButtons(pageIndex, pages)
+				paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 				await componentInteraction
 					.editReply({
@@ -226,7 +226,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	let inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 
-	let paginationButtons = createPaginationButtons(pageIndex, pages)
+	let paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 	let filterMenu = createFilterMenu()
 
 	const message = await interaction.editReply({
@@ -244,7 +244,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		// Handle Pagination
 		if (componentInteraction.isButton()) {
-			pageIndex = getPageIndex(pageIndex, pages, componentInteraction.customId)
+			pageIndex = await getPageIndex(componentInteraction, pageIndex, pages.length)
 
 			inventoryEmbed.setDescription(pages[pageIndex] as string)
 			inventoryEmbed.setFooter({
@@ -253,7 +253,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			inventoryEmbed.setColor("Random")
 
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			await componentInteraction
 				.editReply({
@@ -298,7 +298,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			// Create Inventory Pagination
 			pageIndex = 0
 			pages = createPages(parsedPlayerInventory)
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 			inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
 			inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 			filterMenu = createFilterMenu()
@@ -329,7 +329,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
 			inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 
-			paginationButtons = createPaginationButtons(pageIndex, pages)
+			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			await componentInteraction
 				.editReply({
