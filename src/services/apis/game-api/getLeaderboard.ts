@@ -30,24 +30,20 @@ export async function getLeaderboard({
 	const cachedEntry = await cache.get(cacheKey)
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
-	const data = await GameAPI.get<APILeaderboardResponse>(`/v2/leaderboards`, {
+	const leaderboardPlayers = await GameAPI.get<APILeaderboardResponse>(`/v2/leaderboards`, {
 		params: { limit, offset },
 	})
-		.then(async (response) => {
-			const leaderboardPlayers = response.data._items
+		.then((response) => response.data._items)
+		.catch((error: AxiosError) => logger.error(error))
 
-			leaderboardPlayers.forEach((player) => {
-				player.rankIcon = emojis.rank[`${player.rank}_${player.tier}` as keyof typeof emojis.rank]
-				player.name = player.name.replace(/(\r\n|\r|\n)/, "")
-			})
+	if (!leaderboardPlayers) throw new Error("GameAPI Error: getLeaderboard")
 
-			await cache.set(cacheKey, JSON.stringify(leaderboardPlayers), "EX", DEFAULT_CACHE_EXPIRATION)
+	leaderboardPlayers.forEach((player) => {
+		player.rankIcon = emojis.rank[`${player.rank}_${player.tier}` as keyof typeof emojis.rank]
+		player.name = player.name.replace(/(\r\n|\r|\n)/, "")
+	})
 
-			return leaderboardPlayers
-		})
-		.catch((error: AxiosError) => logger.error(error, "GameAPI Error: getLeaderboard"))
+	await cache.set(cacheKey, JSON.stringify(leaderboardPlayers), "EX", DEFAULT_CACHE_EXPIRATION)
 
-	if (!data) throw new Error("GameAPI Error: getLeaderboard")
-
-	return data
+	return leaderboardPlayers
 }

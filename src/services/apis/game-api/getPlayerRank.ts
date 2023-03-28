@@ -22,7 +22,7 @@ export async function getPlayerRank(userId: UserID): Promise<PlayerLeaderboardDa
 
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
-	const data = await GameAPI.get<APILeaderboardResponse>(`/v2/leaderboards`, {
+	const playerLeaderboardData = await GameAPI.get<APILeaderboardResponse>(`/v2/leaderboards`, {
 		params: { limit: 1, offset: 0, userID: userId },
 	})
 		.then(async (response) => {
@@ -30,17 +30,18 @@ export async function getPlayerRank(userId: UserID): Promise<PlayerLeaderboardDa
 
 			if (!player) return
 
-			player.rankIcon = emojis.rank[`${player.rank}_${player.tier}` as keyof typeof emojis.rank]
-			player.name = player.name.replaceAll(/\r?\n|\r/g, "").trim()
-			player.name = player.name.replaceAll(/(<#.{3,6}>)|(<color=#.{3,6}>)/g, "")
-
-			await cache.set(cacheKey, JSON.stringify(player), "EX", DEFAULT_CACHE_EXPIRATION)
-
 			return player
 		})
-		.catch((error: Error) => logger.error(error, `GameAPI Error: getPlayerRank - ${userId}`))
+		.catch((error: Error) => logger.error(error))
 
-	if (!data) throw new Error(`GameAPI Error: getPlayerRank - ${userId}`)
+	if (!playerLeaderboardData) throw new Error(`GameAPI Error: getPlayerRank - ${userId}`)
 
-	return data
+	playerLeaderboardData.rankIcon =
+		emojis.rank[`${playerLeaderboardData.rank}_${playerLeaderboardData.tier}` as keyof typeof emojis.rank]
+	playerLeaderboardData.name = playerLeaderboardData.name.replaceAll(/\r?\n|\r/g, "").trim()
+	playerLeaderboardData.name = playerLeaderboardData.name.replaceAll(/(<#.{3,6}>)|(<color=#.{3,6}>)/g, "")
+
+	await cache.set(cacheKey, JSON.stringify(playerLeaderboardData), "EX", DEFAULT_CACHE_EXPIRATION)
+
+	return playerLeaderboardData
 }

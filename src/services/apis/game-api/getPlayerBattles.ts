@@ -26,7 +26,7 @@ export async function getPlayerBattles(
 
 	if (cacheEntry) return JSON.parse(cacheEntry)
 
-	const data = await GameAPI.get<APIBattlesResponse>(`/origin/battle-history`, {
+	const playerBattles = await GameAPI.get<APIBattlesResponse>(`/origin/battle-history`, {
 		baseURL: BATTLES_API,
 		params: {
 			limit: options.limit,
@@ -35,20 +35,15 @@ export async function getPlayerBattles(
 			client_id: userId,
 		},
 	})
-		.then(async (response) => {
-			if (!response.data.battles.length) return
+		.then((response) => response.data.battles)
+		.catch((error) => logger.error(error))
 
-			const playerBattles = await parsePlayerBattles(response.data.battles, userId)
+	if (!playerBattles) throw new Error(`GameAPI Error: getPlayerBattles - ${userId}`)
+	if (!playerBattles.length) throw new Error(`Players has no available battles - ${userId}`)
 
-			await cache.set(cacheKey, JSON.stringify(playerBattles), "EX", DEFAULT_CACHE_EXPIRATION)
+	const parsedPlayerBattles = await parsePlayerBattles(playerBattles, userId)
 
-			return playerBattles
-		})
-		.catch((error) => {
-			logger.error(error, `GameAPI Error: getPlayerBattles - ${userId}`)
-		})
+	await cache.set(cacheKey, JSON.stringify(parsedPlayerBattles), "EX", DEFAULT_CACHE_EXPIRATION)
 
-	if (!data) throw new Error(`GameAPI Error: getPlayerBattles - ${userId}`)
-
-	return data
+	return parsedPlayerBattles
 }

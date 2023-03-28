@@ -2,6 +2,7 @@ import { DEFAULT_CACHE_EXPIRATION } from "@constants/index"
 import { Contest, ContestPlayer } from "@custom-types/contest"
 import { ContestAPI } from "@services/api"
 import { cache } from "@services/cache"
+import logger from "pino-logger"
 import { getContest } from "./getContest"
 
 interface APIContestLeaderboardParams {
@@ -9,7 +10,7 @@ interface APIContestLeaderboardParams {
 	page?: number
 }
 
-interface RootObject {
+interface APIContestLeaderboardResponse {
 	data: ContestPlayer[]
 	total: number
 }
@@ -33,23 +34,22 @@ export async function getContestLeaderboard(
 
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
-	const data = await ContestAPI.get<RootObject>(`contest/v1/public/contests/${latestContest.id}/leaderboard`, {
-		params: { limit, page },
-	}).then(async (response) => {
-		const leaderboardPlayers = response.data.data
+	const leaderboardPlayers = await ContestAPI.get<APIContestLeaderboardResponse>(
+		`contest/v1/public/contests/${latestContest.id}/leaderboard`,
+		{ params: { limit, page } }
+	)
+		.then((response) => response.data.data)
+		.catch((error) => logger.error(error))
 
-		leaderboardPlayers.forEach((player) => {
-			player.user_name = player.user_name.replace(/(\r\n|\r|\n)/, "")
-		})
+	if (!leaderboardPlayers) throw new Error("ContestAPI: getContestLeaderboard")
 
-		return leaderboardPlayers
+	leaderboardPlayers.forEach((player) => {
+		player.user_name = player.user_name.replace(/(\r\n|\r|\n)/, "")
 	})
-
-	if (!data) throw new Error("Contest Leaderboard API Failed")
 
 	const constestLeaderboard: ContestLeaderbord = {
 		contest: latestContest,
-		players: data,
+		players: leaderboardPlayers,
 	}
 
 	await cache.set(cacheKey, JSON.stringify(constestLeaderboard), "EX", DEFAULT_CACHE_EXPIRATION)

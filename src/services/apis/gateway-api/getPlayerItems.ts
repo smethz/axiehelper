@@ -8,7 +8,7 @@ import { AxiosError } from "axios"
 import pThrottle from "p-throttle"
 import logger from "pino-logger"
 
-const throttle = pThrottle({ limit: 5, interval: 1000 })
+const throttle = pThrottle({ limit: 10, interval: 1000 })
 
 interface APIPlayerItemsResponse {
 	_items: PlayerItem[]
@@ -41,43 +41,43 @@ export async function getPlayerItems({
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
 	const request = throttle(async () => {
-		return GatewayAPI.get<APIPlayerItemsResponse>("/origin/v2/community/users/items", {
+		const initialPlayerItems = await GatewayAPI.get<APIPlayerItemsResponse>("/origin/v2/community/users/items", {
 			params: { userID, limit, offset, itemIDs },
 		})
-			.then(async (response) => {
-				const metadata = response.data._metadata
-				let items = response.data._items
+			.then(async (response) => response.data)
+			.catch((error: AxiosError) => logger.error(error))
 
-				if (metadata.hasNext) {
-					const totalPages = Math.ceil(metadata.total / metadata.limit)
-					let promisesArray = []
+		if (!initialPlayerItems) return
 
-					for (let currentPage = 1; currentPage < totalPages; currentPage++) {
-						promisesArray.push(
-							GatewayAPI.get<APIPlayerItemsResponse>(`origin/v2/community/users/items`, {
-								params: { userID, limit, offset: 1 + limit * currentPage },
-							})
-						)
-					}
+		const metadata = initialPlayerItems._metadata
+		let playerItems = initialPlayerItems._items
 
-					const settledPromises = await Promise.allSettled(promisesArray)
-					const moreItems = settledPromises.filter(isFulfilled).flatMap((promise) => promise.value.data._items)
+		if (metadata.hasNext) {
+			const totalPages = Math.ceil(metadata.total / metadata.limit)
+			let promisesArray = []
 
-					items = [...new Set([...moreItems, ...items])]
-				}
+			for (let currentPage = 1; currentPage < totalPages; currentPage++) {
+				promisesArray.push(
+					GatewayAPI.get<APIPlayerItemsResponse>(`origin/v2/community/users/items`, {
+						params: { userID, limit, offset: 1 + limit * currentPage },
+					})
+				)
+			}
 
-				await cache.set(cacheKey, JSON.stringify(items), "EX", DEFAULT_CACHE_EXPIRATION)
+			const settledPromises = await Promise.allSettled(promisesArray)
+			const moreItems = settledPromises.filter(isFulfilled).flatMap((promise) => promise.value.data._items)
 
-				return items
-			})
-			.catch((error: AxiosError) => {
-				logger.error(error, `GatewayAPI Error: getPlayerItems - ${userID}`)
-			})
+			playerItems = [...new Set([...moreItems, ...playerItems])]
+		}
+
+		return playerItems
 	})
 
 	const data = await request()
 
 	if (!data) throw new Error(`GatewayAPI Error: getPlayerItems - ${userID}`)
+
+	await cache.set(cacheKey, JSON.stringify(data), "EX", DEFAULT_CACHE_EXPIRATION)
 
 	return data
 }

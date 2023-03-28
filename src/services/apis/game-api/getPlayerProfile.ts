@@ -14,28 +14,25 @@ export async function getPlayerProfile(userId: UserID): Promise<ParsedPlayerInga
 	const cacheEntry = await cache.get(cacheKey)
 	if (cacheEntry) return { ...JSON.parse(cacheEntry), source: "CACHE" }
 
-	const data = await GameAPI.get<ParsedPlayerIngameProfile>(`/v2/users/${userId}/profiles`)
-		.then(async (response) => {
-			const playerProfile = response.data
-			playerProfile.name = playerProfile.name.replaceAll(/\r?\n|\r/g, "").trim()
-			playerProfile.name = playerProfile.name.replaceAll(/(<#.{3,6}>)|(<color=#.{3,6}>)/g, "")
+	const playerProfile = await GameAPI.get<ParsedPlayerIngameProfile>(`/v2/users/${userId}/profiles`)
+		.then(async (response) => response.data)
+		.catch((error) => logger.error(error))
 
-			playerProfile.roninAddress = parseAddress(playerProfile.roninAddress, "ronin")
+	if (!playerProfile) throw new Error(`GameAPI Error: getPlayerProfile - ${userId}`)
 
-			playerProfile["url"] = {
-				axies_io: `${AXIES_IO_URL}/profile/${playerProfile.roninAddress}`,
-				explorer: `${RONINCHAIN_URL}/address/${playerProfile.roninAddress}`,
-				marketplace: `${MARKETPLACE_URL}/profile/${playerProfile.roninAddress}`,
-			}
+	playerProfile.name = playerProfile.name.replaceAll(/\r?\n|\r/g, "").trim()
+	playerProfile.name = playerProfile.name.replaceAll(/(<#.{3,6}>)|(<color=#.{3,6}>)/g, "")
 
-			await cache.set(cacheKey, JSON.stringify({ ...playerProfile, source: "API" }), "EX", DEFAULT_CACHE_EXPIRATION)
-			await updateProfileName(userId, playerProfile.name)
+	playerProfile.roninAddress = parseAddress(playerProfile.roninAddress, "ronin")
 
-			return playerProfile
-		})
-		.catch((error) => logger.error(error, `GameAPI Error: getPlayerProfile - ${userId}`))
+	playerProfile.url = {
+		axies_io: `${AXIES_IO_URL}/profile/${playerProfile.roninAddress}`,
+		explorer: `${RONINCHAIN_URL}/address/${playerProfile.roninAddress}`,
+		marketplace: `${MARKETPLACE_URL}/profile/${playerProfile.roninAddress}`,
+	}
 
-	if (!data) throw new Error(`GameAPI Error: getPlayerProfile - ${userId}`)
+	await cache.set(cacheKey, JSON.stringify({ ...playerProfile, source: "API" }), "EX", DEFAULT_CACHE_EXPIRATION)
+	await updateProfileName(userId, playerProfile.name)
 
-	return data
+	return playerProfile
 }
