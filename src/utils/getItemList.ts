@@ -11,12 +11,12 @@ export function getCardsList(): ParsedCard[] {
 
 export function getRunesList(): ParsedRune[] {
 	const list = readJsonSync(path.join(__dirname, "../constants/props/runes.json"), "utf-8")
-	return list.filter((rune: ParsedRune) => rune.item.id.endsWith("_nft"))
+	return list.filter((rune: ParsedRune) => rune.item.id.endsWith("_nft") || rune.item.id.endsWith("_nondec"))
 }
 
 export function getCharmsList(): ParsedCharm[] {
 	const list = readJsonSync(path.join(__dirname, "../constants/props/charms.json"), "utf-8")
-	return list.filter((charm: ParsedCharm) => charm.item.id.endsWith("_nft"))
+	return list.filter((charm: ParsedCharm) => charm.item.id.endsWith("_nft") || charm.item.id.endsWith("_nondec"))
 }
 
 export function getBodyparts(): Part[] {
