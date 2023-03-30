@@ -62,7 +62,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		axieEmbed.setColor(axieClassProps[axie.class].color as ColorResolvable)
 	}
 
-	axieEmbed.setImage(axie.image)
+	axieEmbed.setImage(`https://axiecdn.axieinfinity.com/axies/${axie.id}/axie/axie-full-transparent.png`)
 
 	await interaction.editReply({ embeds: [axieEmbed] }).catch(() => {})
 }
