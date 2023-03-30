@@ -27,9 +27,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	const inviteEmbed = new EmbedBuilder().setTitle(translate("invite_title")).setColor("Random")
 
 	const inviteButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder().setLabel(translate("add_bot")).setStyle(ButtonStyle.Link).setURL(CLIENT_INVITE_URL),
+		new ButtonBuilder().setLabel(translate("labels.add_bot")).setStyle(ButtonStyle.Link).setURL(CLIENT_INVITE_URL),
 
-		new ButtonBuilder().setLabel(translate("support_server")).setStyle(ButtonStyle.Link).setURL(GUILD_INVITE_URL)
+		new ButtonBuilder().setLabel(translate("labels.support_server")).setStyle(ButtonStyle.Link).setURL(GUILD_INVITE_URL)
 	)
 
 	interaction
