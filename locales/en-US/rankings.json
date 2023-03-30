@@ -13,7 +13,7 @@
 			}
 		},
 		"event": {
-			"name": "arena",
+			"name": "event",
 			"description": "Get the rankings for the Latest Event",
 			"options": {
 				"rank": {
