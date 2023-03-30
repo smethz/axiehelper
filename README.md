@@ -24,7 +24,7 @@ _A Discord Bot for Axie Infinity_
 
 ### Demo
 
-https://user-images.githubusercontent.com/90774126/226360060-1278e6cc-7bf7-46bf-8edf-3ace82d2d24f.mp4
+https://user-images.githubusercontent.com/90774126/228704377-c09308b0-dadb-44a8-9e98-d2e046b445f1.mp4
 
 ## Documentation
 
