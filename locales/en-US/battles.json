@@ -34,6 +34,8 @@
 		"name": "Result",
 		"value": "**{{- result}}**"
 	},
+	"battle_initiator_player": "***Player** went first to attack*",
+	"battle_initiator_opponent": "***Opponent** went first to attack*",
 	"starter_name": "Starter {{starterId}}",
 	"opponent_field": "Opponent",
 	"player_team_field": "Player Team",

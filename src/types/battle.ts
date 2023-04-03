@@ -75,6 +75,7 @@ export interface ParsedArenaBattle extends ArenaBattle {
 	}
 	battleIndex: number
 	result: "Victory" | "Defeated" | "Draw"
+	rps_winner?: string
 	result_emoji: "🟢" | "🔴" | "⚪"
 }
 

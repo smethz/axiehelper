@@ -2,7 +2,7 @@ import { RoninAddress, UserID } from "@custom-types/common"
 import { utils } from "ethers"
 
 const USER_ID_LENGTH = 36
-const VALID_UUID_REGEX = /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i
+export const VALID_UUID_REGEX = /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i
 
 export function isValidClientID(userId: UserID): boolean {
 	return VALID_UUID_REGEX.test(userId)

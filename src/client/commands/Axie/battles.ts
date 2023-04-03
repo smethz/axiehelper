@@ -1,5 +1,6 @@
 import { getPlayerBattles } from "@apis/game-api/getPlayerBattles"
 import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
+import { getBattleReplay } from "@apis/getBattleReplay"
 import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import autocomplete from "@client/components/autocomplete"
 import {
@@ -247,6 +248,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				selectedBattle?.battleIndex
 			)
 
+			const rpsWinner = await getBattleReplay(selectedBattle!.battle_uuid)
+			if (rpsWinner) selectedBattle!.rps_winner = rpsWinner
+
 			const battleEmbed = await createBattleEmbed(selectedBattle!)
 
 			battleSelector.components[0]?.options
@@ -405,8 +409,12 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				? `${battle.player.rewards?.old_vstar} ➡ ${battle.player.rewards?.new_vstar}\n${battle.player.rewards?.vstar_gained} ${emojis.victory_star}`
 				: `${battle.player.rewards?.old_vstar} ➡ ${battle.player.rewards?.new_vstar}\n${battle.player.rewards?.vstar_gained} ${emojis.victory_star}\n${battle.player.rewards?.slp_gained} ${emojis.tokens.slp}\n${battle.player.rewards?.moonshard_gained} ${emojis.moonshard}`
 
+		const battleInitiator = translate("battle_initiator", {
+			context: battle.rps_winner === battle.player.userId ? "player" : "opponent",
+		})
+
 		return new EmbedBuilder()
-			.setDescription(playerIdentifier)
+			.setDescription(playerIdentifier + "\n" + battleInitiator)
 			.addFields({
 				name: translate("watch_field.name"),
 				value: translate("watch_field.value", {
@@ -471,12 +479,12 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			const parsed_moonshard_gained =
 				(battle.player.rewards!.moonshard_gained <= 0 ? "" : "+") + battle.player.rewards!.moonshard_gained
 
-			const rowLabel =
-				battle.result === "Defeated"
-					? `${battle.battleIndex + 1}. ${translate(`results.${battle.result}`)} | ${format_vstar_gained} V.Stars`
-					: `${battle.battleIndex + 1}. ${
-							battle.result
-					  } | ${format_vstar_gained} V.Star | ${parsed_slp_gained} SLP | ${parsed_moonshard_gained} M.Shards`
+			let rowLabel =
+				`${battle.battleIndex + 1}.` + ` ${translate(`results.${battle.result}`)}` + ` | ${format_vstar_gained} V.Star`
+
+			if (battle.result === "Victory") {
+				rowLabel += ` | ${parsed_slp_gained} SLP` + ` | ${parsed_moonshard_gained} M.Shards`
+			}
 
 			const parsedBattleType = {
 				pvp: translate("friendly_pvp"),
