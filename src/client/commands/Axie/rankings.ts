@@ -18,6 +18,7 @@ import { PlayerLeaderboardData } from "@custom-types/profile"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents } from "@utils/componentsToggler"
 import { numberFormatter } from "@utils/currencyFormatter"
+import { isAPIError } from "@utils/isAPIError"
 import { ApplicationCommandOptionType, ComponentType, EmbedBuilder, PermissionsBitField } from "discord.js"
 
 const command: SlashCommand = {
@@ -83,13 +84,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	if (isArena) {
 		let arenaLeaderboard = await getLeaderboard({ offset: (leaderboardPage - 1) * 20, limit: numOfPlayersPerPage })
 
-		if (!arenaLeaderboard) {
-			await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
-			return
-		}
-
-		if (!arenaLeaderboard._items.length) {
-			await interaction.editReply({ embeds: [noPlayersEmbed] }).catch(() => {})
+		if (!arenaLeaderboard || isAPIError(arenaLeaderboard)) {
+			await interaction.editReply({ embeds: [!arenaLeaderboard ? noPlayersEmbed : requestFailedEmbed] }).catch(() => {})
 			return
 		}
 
@@ -127,6 +123,13 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			arenaLeaderboard = await getLeaderboard({ offset: pageIndex * 20 })
 
+			if (!arenaLeaderboard || isAPIError(arenaLeaderboard)) {
+				await interaction
+					.editReply({ embeds: [!arenaLeaderboard ? noPlayersEmbed : requestFailedEmbed] })
+					.catch(() => {})
+				return
+			}
+
 			parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
 			pages = createPages(parsedLeaderboard)
 			paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
@@ -163,13 +166,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		page: leaderboardPage,
 	})
 
-	if (!contestLeaderboard) {
-		await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
-		return
-	}
-
-	if (!contestLeaderboard.players.length) {
-		await interaction.editReply({ embeds: [noPlayersEmbed] }).catch(() => {})
+	if (!contestLeaderboard || isAPIError(contestLeaderboard)) {
+		await interaction.editReply({ embeds: [!contestLeaderboard ? noPlayersEmbed : requestFailedEmbed] }).catch(() => {})
 		return
 	}
 
@@ -220,13 +218,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			page: pageIndex + 1,
 		})
 
-		if (!contestLeaderboard) {
-			await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
-			return
-		}
-
-		if (!contestLeaderboard.players.length) {
-			await interaction.editReply({ embeds: [noPlayersEmbed] }).catch(() => {})
+		if (!contestLeaderboard || isAPIError(contestLeaderboard)) {
+			await interaction
+				.editReply({ embeds: [!contestLeaderboard ? noPlayersEmbed : requestFailedEmbed] })
+				.catch(() => {})
 			return
 		}
 

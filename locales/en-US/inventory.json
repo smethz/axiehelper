@@ -39,6 +39,10 @@
 		"request_failed": {
 			"title": "Request Failed",
 			"description": "Couldn't retrieve user inventory."
+		},
+		"empty_inventory": {
+			"title": "Empty Inventory",
+			"description": "User has no items in their inventory."
 		}
 	}
 }

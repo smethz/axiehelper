@@ -11,6 +11,7 @@ import { RoninAddress } from "@custom-types/common"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents } from "@utils/componentsToggler"
 import { getUser } from "@utils/dbFunctions"
+import { isAPIError } from "@utils/isAPIError"
 import { parseAddress } from "@utils/parsers"
 import { isValidRoninAddress } from "@utils/validateAddress"
 import {
@@ -60,7 +61,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		: undefined
 	const specifiedUser = interaction.options.getMember("user") ?? interaction.user
 
-	const failedEmbed = createErrorEmbed({
+	const requestFailedEmbed = createErrorEmbed({
 		title: translate("errors.request_failed.title"),
 		description: translate("errors.request_failed.description"),
 	})
@@ -81,16 +82,18 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		const userAssets = await getAssets(specifiedAddress)
 
-		if (!userAssets || !userAssets.total) {
+		if (!userAssets || isAPIError(userAssets)) {
 			await interaction
 				.editReply({
-					embeds: [!userAssets ? failedEmbed : noAssetsEmbed],
+					embeds: [!userAssets ? noAssetsEmbed : requestFailedEmbed],
 				})
 				.catch(() => {})
 			return
 		}
 
-		const userProfile = await resolveProfile(specifiedAddress)
+		let userProfile = await resolveProfile(specifiedAddress)
+
+		if (isAPIError(userProfile)) userProfile = undefined
 
 		const assetsEmbed = createAssetsEmbed(userAssets, userProfile, specifiedAddress)
 
@@ -112,10 +115,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	let userAssets = await getAssets(dbUser.savedProfiles[0]!.profile.roninAddress)
 
 	// Error: API Error or Ronin Address has no Assets
-	if (!userAssets || !userAssets.total) {
+	if (!userAssets || isAPIError(userAssets)) {
 		await interaction
 			.editReply({
-				embeds: [!userAssets ? failedEmbed : noAssetsEmbed],
+				embeds: [!userAssets ? noAssetsEmbed : requestFailedEmbed],
 			})
 			.catch(() => {})
 
@@ -123,7 +126,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	}
 
 	// Fetch Name
-	const userProfile = await resolveProfile(dbUser.savedProfiles[0]!.profileId)
+	let userProfile = await resolveProfile(dbUser.savedProfiles[0]!.profileId)
+
+	if (isAPIError(userProfile)) userProfile = undefined
 
 	const assetsEmbed = createAssetsEmbed(userAssets, userProfile, dbUser.savedProfiles[0]?.profileId!)
 
@@ -159,10 +164,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		profileSelector = createProfileSelectMenu(dbUser.savedProfiles, selectedProfile)
 
 		// Error: API Error or Ronin Address has no Assets
-		if (!userAssets || !userAssets.total) {
+		if (!userAssets || isAPIError(userAssets)) {
 			await interaction
 				.editReply({
-					embeds: [!userAssets ? failedEmbed : noAssetsEmbed],
+					embeds: [!userAssets ? requestFailedEmbed : noAssetsEmbed],
 					components: [profileSelector],
 				})
 				.catch(() => {})
@@ -170,7 +175,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			return
 		}
 
-		const userProfile = await resolveProfile(selectedProfile.profileId)
+		let userProfile = await resolveProfile(selectedProfile.profileId)
+
+		if (isAPIError(userProfile)) userProfile = undefined
 
 		const assetsEmbed = createAssetsEmbed(userAssets, userProfile, selectedProfile.profile.roninAddress)
 

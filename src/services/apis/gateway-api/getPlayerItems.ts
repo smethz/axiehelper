@@ -3,6 +3,7 @@ import { UserID } from "@custom-types/common"
 import { PlayerItem } from "@custom-types/items"
 import { GatewayAPI } from "@services/api"
 import { cache } from "@services/cache"
+import { isAPIError } from "@utils/isAPIError"
 import { isFulfilled } from "@utils/promiseHandler"
 import { AxiosError } from "axios"
 import pThrottle from "p-throttle"
@@ -35,19 +36,24 @@ export async function getPlayerItems({
 	limit = 100,
 	offset = 0,
 	itemIDs,
-}: APIPlayerItemsParams): Promise<PlayerItem[]> {
+}: APIPlayerItemsParams): Promise<PlayerItem[] | AxiosError | void> {
 	const cacheKey = `playerItems:${userID}`
 	const cachedEntry = await cache.get(cacheKey)
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
-	const request = throttle(async () => {
+	const throttledRequest = throttle(async () => {
 		const initialPlayerItems = await GatewayAPI.get<APIPlayerItemsResponse>("/origin/v2/community/users/items", {
 			params: { userID, limit, offset, itemIDs },
 		})
 			.then(async (response) => response.data)
-			.catch((error: AxiosError) => logger.error(error))
+			.catch((error: AxiosError) => {
+				logger.error(`GatewayAPI Error: ${error.response?.status} getPlayerItems - ${userID}`)
+				return error
+			})
 
-		if (!initialPlayerItems) return
+		if (isAPIError(initialPlayerItems)) return initialPlayerItems
+
+		if (!initialPlayerItems._items.length) return
 
 		const metadata = initialPlayerItems._metadata
 		let playerItems = initialPlayerItems._items
@@ -73,11 +79,13 @@ export async function getPlayerItems({
 		return playerItems
 	})
 
-	const data = await request()
+	const playerItems = await throttledRequest()
 
-	if (!data) throw new Error(`GatewayAPI Error: getPlayerItems - ${userID}`)
+	if (!playerItems) return
 
-	await cache.set(cacheKey, JSON.stringify(data), "EX", DEFAULT_CACHE_EXPIRATION)
+	if (isAPIError(playerItems)) return playerItems
 
-	return data
+	await cache.set(cacheKey, JSON.stringify(playerItems), "EX", DEFAULT_CACHE_EXPIRATION)
+
+	return playerItems
 }

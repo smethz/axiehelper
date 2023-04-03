@@ -10,6 +10,7 @@ import logger from "pino-logger"
 export async function getMinTokenPrice(): Promise<ItemMinimumPrice[] | void> {
 	const cacheKey = `min_tokenprice`
 	const cacheEntry = await cache.get(cacheKey)
+	const cacheExpiration = 60 * 15 // 15 minutes in seconds
 
 	if (cacheEntry) return JSON.parse(cacheEntry)
 
@@ -49,7 +50,7 @@ export async function getMinTokenPrice(): Promise<ItemMinimumPrice[] | void> {
 				prices = [...prices, ...items]
 			}
 
-			await cache.set(cacheKey, JSON.stringify(prices), "EX", 60 * 15)
+			await cache.set(cacheKey, JSON.stringify(prices), "EX", cacheExpiration)
 
 			return prices.filter((token) => token.minPrice)
 		})

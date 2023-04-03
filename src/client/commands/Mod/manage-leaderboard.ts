@@ -8,12 +8,13 @@ import { ActionRowBuilder, ButtonBuilder } from "@discordjs/builders"
 import { PlayerProfile } from "@prisma/client"
 import { componentFilter } from "@utils/componentFilter"
 import {
-	getGuildLeaderboard,
 	GuildWithLeaderboard,
+	getGuildLeaderboard,
 	removePlayersFromLeaderboard,
 	resetGuildLeaderboard,
 	updateGuildLeaderboard,
 } from "@utils/dbFunctions"
+import { isAPIError } from "@utils/isAPIError"
 import { isFulfilled } from "@utils/promiseHandler"
 import { trimStringInBack } from "@utils/trimString"
 import { determineAddress } from "@utils/validateAddress"
@@ -476,8 +477,9 @@ async function getValidProfile(validID: string) {
 	if (determineAddress(validID) == "roninAddress") {
 		const resolvedProfile = await resolveProfile(validID)
 
-		if (!resolvedProfile) return
-		if (resolvedProfile) validID = resolvedProfile.accountId
+		if (!resolvedProfile || isAPIError(resolvedProfile)) return
+
+		validID = resolvedProfile.accountId
 	}
 
 	return getPlayerProfile(validID)

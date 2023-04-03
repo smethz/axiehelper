@@ -8,7 +8,7 @@ import {
 	sendInvalidProfileError,
 	sendNoSavedProfilesError,
 } from "@client/components/embeds"
-import { createDynamicSelection, createProfileSelectMenu, PROFILE_SELECTOR_ID } from "@client/components/selection"
+import { PROFILE_SELECTOR_ID, createDynamicSelection, createProfileSelectMenu } from "@client/components/selection"
 import { DEFAULT_IDLE_TIME } from "@constants/index"
 import emojis from "@constants/props/emojis.json"
 import { AXIES_IO_URL, MARKETPLACE_URL } from "@constants/url"
@@ -18,14 +18,15 @@ import { createBattleCanvas, createBattleStatsCanvas } from "@utils/canvas"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents, enableComponents } from "@utils/componentsToggler"
 import { getUser } from "@utils/dbFunctions"
+import { isAPIError } from "@utils/isAPIError"
 import { parseAddress } from "@utils/parsers"
 import { determineAddress, isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import dayjs from "dayjs"
 import localizedFormat from "dayjs/plugin/localizedFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {
-	ActionRowBuilder,
 	APISelectMenuOption,
+	ActionRowBuilder,
 	ApplicationCommandOptionType,
 	AttachmentBuilder,
 	ComponentType,
@@ -97,7 +98,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		// Valid Format - No Profile
 		if (determineAddress(specifiedId)) {
 			const playerProfile = await resolveProfile(specifiedId)
-			if (!playerProfile) {
+
+			if (!playerProfile || isAPIError(playerProfile)) {
 				await sendInvalidProfileError(interaction)
 				return
 			}
@@ -107,7 +109,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		const playerBattles = await getPlayerBattles(specifiedId)
 
-		if (!playerBattles || !playerBattles.battles.length) {
+		if (isAPIError(playerBattles) || !playerBattles) {
 			await interaction
 				.editReply({
 					embeds: [!playerBattles ? failedBattlesEmbed : noBattlesEmbed],
@@ -191,7 +193,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	let playerBattles = await getPlayerBattles(user.savedProfiles[0]?.profileId!)
 
 	// No Battles - API Failed | No Battles
-	if (!playerBattles || !playerBattles.battles.length) {
+	if (isAPIError(playerBattles) || !playerBattles) {
 		await interaction
 			.editReply({
 				embeds: [!playerBattles ? failedBattlesEmbed : noBattlesEmbed],
@@ -228,9 +230,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		await selectMenuInteraction.deferUpdate()
 		// Change Battle
 		if (selectMenuInteraction.customId === "selected-battle") {
-			const selectedBattle = playerBattles?.battles.find(
+			const selectedBattle = (playerBattles as ParsedPlayerBattles).battles.find(
 				(battle) => battle.battle_uuid === selectMenuInteraction.values[0]
-			)!
+			)
 
 			disableComponents(battleSelector, profileSelector)
 
@@ -240,7 +242,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				})
 				.catch(() => {})
 
-			battleSelector = createBattleSelection(playerBattles!.battles, selectedBattle?.battleIndex)
+			battleSelector = createBattleSelection(
+				(playerBattles as ParsedPlayerBattles).battles,
+				selectedBattle?.battleIndex
+			)
 
 			const battleEmbed = await createBattleEmbed(selectedBattle!)
 
@@ -284,7 +289,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			playerBattles = await getPlayerBattles(selectMenuInteraction.values[0]!)
 
 			// No Battles - API Failed | No Battles
-			if (!playerBattles || !playerBattles.battles.length) {
+			if (isAPIError(playerBattles) || !playerBattles) {
 				enableComponents(profileSelector)
 				await interaction
 					.editReply({
@@ -378,7 +383,11 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	}
 
 	async function createBattleEmbed(battle: ParsedArenaBattle): Promise<EmbedBuilder> {
-		battle.opponent.profile = await getPlayerProfile(battle.opponent.userId)
+		const opponentProfile = await getPlayerProfile(battle.opponent.userId)
+
+		if (opponentProfile && !isAPIError(opponentProfile)) {
+			battle.opponent.profile = opponentProfile
+		}
 
 		const playerIdentifier = battle.player.profile
 			? `[${emojis.axies_io} ${battle.player.profile.name}](${battle.player.profile.url.axies_io})`

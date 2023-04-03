@@ -4,24 +4,31 @@ import { UserID } from "@custom-types/common"
 import { ParsedPlayerIngameProfile } from "@custom-types/profile"
 import { GameAPI } from "@services/api"
 import { cache } from "@services/cache"
+import { cleanPlayerName } from "@utils/cleanPlayerName"
 import { updateProfileName } from "@utils/dbFunctions"
+import { isAPIError } from "@utils/isAPIError"
 import { parseAddress } from "@utils/parsers"
+import { AxiosError } from "axios"
 import logger from "pino-logger"
 
-export async function getPlayerProfile(userId: UserID): Promise<ParsedPlayerIngameProfile> {
+export async function getPlayerProfile(userId: UserID): Promise<ParsedPlayerIngameProfile | AxiosError | void> {
 	const cacheKey = `profileDetails:${userId}`
-
 	const cacheEntry = await cache.get(cacheKey)
+
 	if (cacheEntry) return { ...JSON.parse(cacheEntry), source: "CACHE" }
 
 	const playerProfile = await GameAPI.get<ParsedPlayerIngameProfile>(`/v2/users/${userId}/profiles`)
 		.then(async (response) => response.data)
-		.catch((error) => logger.error(error))
+		.catch((error: AxiosError) => {
+			logger.error(error, `GameAPI Error: ${error.response?.status} getPlayerProfile - ${userId}`)
+			return error
+		})
 
-	if (!playerProfile) throw new Error(`GameAPI Error: getPlayerProfile - ${userId}`)
+	if (isAPIError(playerProfile)) return playerProfile
 
-	playerProfile.name = playerProfile.name.replaceAll(/\r?\n|\r/g, "").trim()
-	playerProfile.name = playerProfile.name.replaceAll(/(<#.{3,6}>)|(<color=#.{3,6}>)/g, "")
+	if (!playerProfile) return
+
+	playerProfile.name = cleanPlayerName(playerProfile.name)
 
 	playerProfile.roninAddress = parseAddress(playerProfile.roninAddress, "ronin")
 

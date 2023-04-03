@@ -4,7 +4,9 @@ import { ArenaBattle, ParsedPlayerBattles } from "@custom-types/battle"
 import { UserID } from "@custom-types/common"
 import { GameAPI } from "@services/api"
 import { cache } from "@services/cache"
+import { isAPIError } from "@utils/isAPIError"
 import { parsePlayerBattles } from "@utils/parsers"
+import { AxiosError } from "axios"
 import logger from "pino-logger"
 
 interface APIBattlesResponse {
@@ -20,7 +22,7 @@ interface APIBattlesParams {
 export async function getPlayerBattles(
 	userId: UserID,
 	options: APIBattlesParams = { limit: 100, offset: 0, type: "pvp" }
-): Promise<ParsedPlayerBattles> {
+): Promise<ParsedPlayerBattles | AxiosError | void> {
 	const cacheKey = `playerBattles:${userId}`
 	const cacheEntry = await cache.get(cacheKey)
 
@@ -36,10 +38,14 @@ export async function getPlayerBattles(
 		},
 	})
 		.then((response) => response.data.battles)
-		.catch((error) => logger.error(error))
+		.catch((error: AxiosError) => {
+			logger.error(error, `GameAPI Error: ${error.response?.status} getPlayerBattles - ${userId}`)
+			return error
+		})
 
-	if (!playerBattles) throw new Error(`GameAPI Error: getPlayerBattles - ${userId}`)
-	if (!playerBattles.length) throw new Error(`Players has no available battles - ${userId}`)
+	if (isAPIError(playerBattles)) return
+
+	if (!playerBattles.length) return
 
 	const parsedPlayerBattles = await parsePlayerBattles(playerBattles, userId)
 

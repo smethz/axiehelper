@@ -1,5 +1,6 @@
 import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import { RoninAddress } from "@custom-types/common"
+import { isAPIError } from "@utils/isAPIError"
 
 const USER_ID_CHAR_LENGTH = 36 // The number of characters in a User ID
 const ETH_ID_CHAR_LENGTH = 40 // The number of characters in a ETH Address without "0x" prefix
@@ -14,7 +15,7 @@ const ETH_ID_CHAR_LENGTH = 40 // The number of characters in a ETH Address witho
 export async function parseId(id: string, format: "ronin" | "ethereum" = "ethereum"): Promise<string> {
 	if (id.length === USER_ID_CHAR_LENGTH) {
 		const playerIdentifier = await resolveProfile(id)
-		if (playerIdentifier) id = playerIdentifier.ronin
+		if (playerIdentifier && !isAPIError(playerIdentifier)) id = playerIdentifier.ronin
 	}
 
 	return parseAddress(id, format)

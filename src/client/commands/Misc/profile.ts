@@ -2,6 +2,7 @@ import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import { createErrorEmbed } from "@client/components/embeds"
 import { AXIES_IO_URL } from "@constants/url"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
+import { isAPIError } from "@utils/isAPIError"
 import { parseAddress } from "@utils/parsers"
 import { determineAddress } from "@utils/validateAddress"
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionsBitField } from "discord.js"
@@ -46,13 +47,13 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const profile = await resolveProfile(id)
 
-	if (!profile || !profile.accountId || !profile.ronin) {
-		const invalidProfileEmbed = createErrorEmbed({
-			title: translate("errors.no_profile.title"),
-			description: translate("errors.no_profile.description"),
-		})
+	const noProfileEmbed = createErrorEmbed({
+		title: translate("errors.no_profile.title"),
+		description: translate("errors.no_profile.description"),
+	})
 
-		await interaction.editReply({ embeds: [invalidProfileEmbed] }).catch(() => {})
+	if (!profile || isAPIError(profile)) {
+		await interaction.editReply({ embeds: [noProfileEmbed] }).catch(() => {})
 		return
 	}
 

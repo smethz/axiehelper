@@ -87,7 +87,9 @@ export function parseArenaBattle(
 export async function parsePlayerBattles(playerBattles: PlayerBattles, userId: UserID): Promise<ParsedPlayerBattles> {
 	const profile = await getPlayerProfile(userId)
 
-	const battles = playerBattles.map((battle, index) => parseArenaBattle(battle, userId, index, profile))
+	const battles = playerBattles.map((battle, index) =>
+		parseArenaBattle(battle, userId, index, profile as ParsedPlayerIngameProfile)
+	)
 
 	const match_total = battles.length
 
@@ -114,7 +116,7 @@ export async function parsePlayerBattles(playerBattles: PlayerBattles, userId: U
 
 	const parsedPlayerBattles = {
 		battles,
-		player: profile,
+		player: profile as ParsedPlayerIngameProfile,
 		match_total,
 		win_total,
 		win_rate,
@@ -167,12 +169,13 @@ async function getCurrentStamina(playerBattle: ParsedPlayerBattles) {
 
 	const totalBattles = todayBattles.length
 
-	if (!totalBattles)
+	if (!totalBattles) {
 		return {
 			currentStamina: maxStamina,
 			maxStamina,
 			numOfPersonalAxies,
 		}
+	}
 
 	return {
 		currentStamina: maxStamina - totalBattles > 0 ? maxStamina - totalBattles : 0,

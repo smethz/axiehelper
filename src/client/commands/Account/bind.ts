@@ -6,6 +6,7 @@ import { CommandExecuteParams, InteractionModalParams, SlashCommand } from "@cus
 import { Prisma } from "@prisma/client"
 import { db } from "@services/db"
 import { createUser, getUser } from "@utils/dbFunctions"
+import { isAPIError } from "@utils/isAPIError"
 import { isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import {
 	ActionRowBuilder,
@@ -97,14 +98,15 @@ async function validateModal({ interaction, translate }: InteractionModalParams)
 		description: translate("errors.profile_not_retrieved.description"),
 	})
 
-	if (!profileIdentifier) {
+	if (!profileIdentifier || isAPIError(profileIdentifier)) {
 		await interaction.editReply({ embeds: [invalidEmbed] }).catch(() => {})
 		return
 	}
 
+	// Making another request to get In-game's name. `resolveProfile` returns the marketplace's name
 	const profileDetails = await getPlayerProfile(profileIdentifier.accountId)
 
-	if (!profileDetails) {
+	if (!profileDetails || isAPIError(profileDetails)) {
 		await interaction.editReply({ embeds: [invalidEmbed] }).catch(() => {})
 		return
 	}

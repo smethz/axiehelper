@@ -5,6 +5,7 @@ import { isAPIError } from "./isAPIError"
 export async function getPlayerCharmsAndRunes(userID: string) {
 	const playerItems = await getPlayerItems({ userID })
 
+	if (!playerItems) return
 	if (isAPIError(playerItems)) return playerItems
 
 	return parseInventory(playerItems)

@@ -4,6 +4,9 @@ import { UserID } from "@custom-types/common"
 import { PlayerLeaderboardData } from "@custom-types/profile"
 import { GameAPI } from "@services/api"
 import { cache } from "@services/cache"
+import { cleanPlayerName } from "@utils/cleanPlayerName"
+import { isAPIError } from "@utils/isAPIError"
+import { AxiosError } from "axios"
 import logger from "pino-logger"
 
 interface APILeaderboardResponse {
@@ -16,7 +19,7 @@ interface APILeaderboardResponse {
 	}
 }
 
-export async function getPlayerRank(userId: UserID): Promise<PlayerLeaderboardData> {
+export async function getPlayerRank(userId: UserID): Promise<PlayerLeaderboardData | AxiosError | void> {
 	const cacheKey = `rank:${userId}`
 	const cachedEntry = await cache.get(cacheKey)
 
@@ -32,14 +35,18 @@ export async function getPlayerRank(userId: UserID): Promise<PlayerLeaderboardDa
 
 			return player
 		})
-		.catch((error: Error) => logger.error(error))
+		.catch((error: AxiosError) => {
+			logger.error(error, `GameAPI Error: ${error.response?.status} getPlayerRank - ${userId}`)
+			return error
+		})
 
-	if (!playerLeaderboardData) throw new Error(`GameAPI Error: getPlayerRank - ${userId}`)
+	if (isAPIError(playerLeaderboardData)) return playerLeaderboardData
+
+	if (!playerLeaderboardData) return
 
 	playerLeaderboardData.rankIcon =
 		emojis.rank[`${playerLeaderboardData.rank}_${playerLeaderboardData.tier}` as keyof typeof emojis.rank]
-	playerLeaderboardData.name = playerLeaderboardData.name.replaceAll(/\r?\n|\r/g, "").trim()
-	playerLeaderboardData.name = playerLeaderboardData.name.replaceAll(/(<#.{3,6}>)|(<color=#.{3,6}>)/g, "")
+	playerLeaderboardData.name = cleanPlayerName(playerLeaderboardData.name)
 
 	await cache.set(cacheKey, JSON.stringify(playerLeaderboardData), "EX", DEFAULT_CACHE_EXPIRATION)
 

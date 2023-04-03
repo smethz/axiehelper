@@ -26,7 +26,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const latestLunacianNewsList = await getLunacianNews()
 
-	if (!latestLunacianNewsList || !latestLunacianNewsList[0]) {
+	if (!latestLunacianNewsList?.length) {
 		const requestFailedEmbed = createErrorEmbed({
 			title: translate("errors.request_failed.title"),
 			description: translate("errors.request_failed.description"),
@@ -36,7 +36,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	let newsEmbed = createNewsEmbed(latestLunacianNewsList[0])
+	let newsEmbed = createNewsEmbed(latestLunacianNewsList[0]!)
 
 	const latestNewsOptions = latestLunacianNewsList.map((news, index) => {
 		return {

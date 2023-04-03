@@ -4,6 +4,7 @@ import classProps from "@constants/props/axie-class-props.json"
 import { MARKETPLACE_URL } from "@constants/url"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
 import { createDetailedAxieCanvas } from "@utils/canvas"
+import { isAPIError } from "@utils/isAPIError"
 import { parseAddress, parseAxieGenes } from "@utils/parsers"
 import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder, PermissionsBitField } from "discord.js"
 
@@ -35,7 +36,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const axie = await getAxieDetails(axieId)
 
-	if (!axie) {
+	if (!axie || isAPIError(axie)) {
 		const noAxieEmbed = createErrorEmbed({
 			title: translate("errors.no_axie.title"),
 			description: translate("errors.no_axie.description", { axieId }),

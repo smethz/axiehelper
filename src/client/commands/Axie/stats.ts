@@ -20,6 +20,7 @@ import { numberFormatter } from "@utils/currencyFormatter"
 import { getUser } from "@utils/dbFunctions"
 import { getOverallStats } from "@utils/getOverallStats"
 import { getPlayerExp } from "@utils/getPlayerExp"
+import { isAPIError } from "@utils/isAPIError"
 import { getRuneCharmsOverviewField, parseAddress, parseInventory } from "@utils/parsers"
 import { determineAddress, isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import {
@@ -88,7 +89,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		// Valid Format - No Profile
 		if (determineAddress(specifiedId)) {
 			const playerProfile = await resolveProfile(specifiedId)
-			if (!playerProfile) {
+			if (!playerProfile || isAPIError(playerProfile)) {
 				await sendInvalidProfileError(interaction)
 				return
 			}

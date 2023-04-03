@@ -5,7 +5,7 @@ import { RoninAddress } from "@custom-types/common"
 import { cache } from "@services/cache"
 import { RoninRPC } from "@services/rpc"
 import { parseAddress, parseBalance } from "@utils/parsers"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import logger from "pino-logger"
 
 interface Token {
@@ -29,8 +29,7 @@ export interface ParsedTokenBalances {
 	roninAddress: RoninAddress
 }
 
-const defaultAssetEmoji = emojis.tokens["contract"]
-export async function getAssets(roninAddress: RoninAddress): Promise<ParsedTokenBalances | void> {
+export async function getAssets(roninAddress: RoninAddress): Promise<ParsedTokenBalances | AxiosError | void> {
 	roninAddress = parseAddress(roninAddress, "ethereum")
 
 	const cacheKey = `assets:${roninAddress}`
@@ -59,6 +58,8 @@ export async function getAssets(roninAddress: RoninAddress): Promise<ParsedToken
 				response.data.total = response.data.total + 1
 			}
 
+			const defaultAssetEmoji = emojis.tokens["contract"]
+
 			for (const token of tokens) {
 				const parsedTokenSymbol = token.token_symbol.toLowerCase().replace(" ", "_")
 				token.parsed_balance = parseBalance(token.balance, token.token_decimals)
@@ -68,5 +69,8 @@ export async function getAssets(roninAddress: RoninAddress): Promise<ParsedToken
 			await cache.set(cacheKey, JSON.stringify(response.data), "EX", DEFAULT_CACHE_EXPIRATION)
 			return response.data
 		})
-		.catch((error) => logger.error(error, "Failed to fetch user assets"))
+		.catch((error: AxiosError) => {
+			logger.error(error, "Failed to fetch user assets")
+			return error
+		})
 }

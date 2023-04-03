@@ -2,14 +2,13 @@ import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
 import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import autocomplete from "@client/components/autocomplete"
 import {
-	createAPIErrorEmbed,
 	createErrorEmbed,
 	sendInvalidFormatError,
 	sendInvalidProfileError,
 	sendNoSavedProfilesError,
 } from "@client/components/embeds"
 import { createPages, createPaginationButtons, getFooter, getPageIndex } from "@client/components/pagination"
-import { createProfileSelectMenu, PROFILE_SELECTOR_ID } from "@client/components/selection"
+import { PROFILE_SELECTOR_ID, createProfileSelectMenu } from "@client/components/selection"
 import { DEFAULT_IDLE_TIME, LATEST_SEASON_ID } from "@constants/index"
 import axieClassProps from "@constants/props/axie-class-props.json"
 import emojis from "@constants/props/emojis.json"
@@ -19,22 +18,22 @@ import { ParsedPlayerIngameProfile } from "@custom-types/profile"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents, enableComponents } from "@utils/componentsToggler"
 import { getUser } from "@utils/dbFunctions"
-import { deepFilter, FilterCriteria } from "@utils/deepFilter"
+import { FilterCriteria, deepFilter } from "@utils/deepFilter"
 import { getPlayerCharmsAndRunes } from "@utils/getPlayerItems"
 import { isAPIError } from "@utils/isAPIError"
 import { getRuneCharmsOverviewField } from "@utils/parsers"
 import { determineAddress, isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import {
-	ActionRowBuilder,
 	APIMessageComponentEmoji,
 	APISelectMenuOption,
+	ActionRowBuilder,
 	ApplicationCommandOptionType,
 	ComponentType,
 	EmbedBuilder,
-	parseEmoji,
 	PermissionsBitField,
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 	StringSelectMenuBuilder,
+	parseEmoji,
 } from "discord.js"
 
 const config: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -74,9 +73,14 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	let specifiedId = interaction.options.getString("id") ? interaction.options.getString("id")!.toLowerCase() : null
 	const specifiedUser = interaction.options.getMember("user") ?? interaction.member
 
-	const failedEmbed = createErrorEmbed({
+	const requestFailedEmbed = createErrorEmbed({
 		title: translate("errors.request_failed.title"),
 		description: translate("errors.request_failed.description"),
+	})
+
+	const emptyInventoryEmbed = createErrorEmbed({
+		title: translate("errors.empty_inventory.title"),
+		description: translate("errors.empty_inventory.description"),
 	})
 
 	// -----------------------------------------------------------------------------
@@ -92,7 +96,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		// Valid Format - No Profile
 		if (determineAddress(specifiedId)) {
 			const playerProfile = await resolveProfile(specifiedId)
-			if (!playerProfile) {
+			if (!playerProfile || isAPIError(playerProfile)) {
 				await sendInvalidProfileError(interaction)
 				return
 			}
@@ -101,12 +105,18 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		}
 
 		const playerProfile = await getPlayerProfile(specifiedId)
+
+		if (!playerProfile || isAPIError(playerProfile)) {
+			await sendInvalidProfileError(interaction)
+			return
+		}
+
 		const playerInventory = await getPlayerCharmsAndRunes(specifiedId)
 
-		if (isAPIError(playerInventory) || !playerInventory.length) {
+		if (!playerInventory || isAPIError(playerInventory)) {
 			await interaction
 				.editReply({
-					embeds: [isAPIError(playerInventory) ? createAPIErrorEmbed(playerInventory) : failedEmbed],
+					embeds: [!playerInventory ? emptyInventoryEmbed : requestFailedEmbed],
 				})
 				.catch(() => {})
 			return
@@ -117,6 +127,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		let pageIndex = 0
 		let pages = createPages(parsedPlayerInventory)
+
+		if (!pages.length) pages = [translate("errors.no_items")]
+
 		let inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
 		let inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 
@@ -127,8 +140,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			embeds: [inventoryOverviewEmbed, inventoryEmbed],
 			components: [paginationButtons, filterMenu],
 		})
-
-		if (pages.length <= 1) return
 
 		const collector = message.createMessageComponentCollector<ComponentType.Button | ComponentType.StringSelect>({
 			idle: DEFAULT_IDLE_TIME,
@@ -204,12 +215,13 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	}
 
 	let playerInventory = await getPlayerCharmsAndRunes(dbUser.savedProfiles[0]!.profileId)
+
 	let playerProfile = await getPlayerProfile(dbUser.savedProfiles[0]!.profileId)
 
-	if (isAPIError(playerInventory) || !playerInventory.length) {
+	if (isAPIError(playerInventory) || isAPIError(playerProfile) || !playerInventory || !playerProfile) {
 		await interaction
 			.editReply({
-				embeds: [isAPIError(playerInventory) ? createAPIErrorEmbed(playerInventory) : failedEmbed],
+				embeds: [!playerInventory ? emptyInventoryEmbed : requestFailedEmbed],
 			})
 			.catch(() => {})
 		return
@@ -222,6 +234,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	let pageIndex = 0
 	let pages = createPages(parsedPlayerInventory)
+
+	if (!pages.length) pages = [translate("errors.no_items")]
+
 	let inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
 
 	let inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
@@ -280,12 +295,12 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			playerInventory = await getPlayerCharmsAndRunes(selectedProfile!.profileId!)
 			playerProfile = await getPlayerProfile(selectedProfile!.profileId)
 
-			if (isAPIError(playerInventory) || !playerInventory.length) {
+			if (isAPIError(playerInventory) || isAPIError(playerProfile) || !playerInventory?.length || !playerProfile) {
 				enableComponents(profileSelector)
 
 				await componentInteraction
 					.editReply({
-						embeds: [isAPIError(playerInventory) ? createAPIErrorEmbed(playerInventory) : failedEmbed],
+						embeds: [!playerInventory ? emptyInventoryEmbed : requestFailedEmbed],
 						components: [paginationButtons, filterMenu, profileSelector],
 					})
 					.catch(() => {})
@@ -316,7 +331,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		if (componentInteraction.isStringSelectMenu() && componentInteraction.customId === "filter-menu") {
 			const filters = componentInteraction.values
 
-			const filteredInventory = filterInventory(playerInventory, filters)
+			const filteredInventory = filterInventory(playerInventory as PlayerItems, filters)
 			const parsedFilteredInventory = parseInventory(filteredInventory)
 
 			filterMenu = createFilterMenu(filters)
@@ -326,7 +341,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			if (!pages.length) pages = [translate("errors.no_items")]
 
-			inventoryOverviewEmbed = createInventoryOverviewEmbed(filteredInventory, playerProfile)
+			inventoryOverviewEmbed = createInventoryOverviewEmbed(
+				filteredInventory,
+				playerProfile as ParsedPlayerIngameProfile
+			)
 			inventoryEmbed = createInventoryEmbed(pages, pageIndex, interaction.locale)
 
 			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })

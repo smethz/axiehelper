@@ -2,6 +2,7 @@ import { getAxieDetails } from "@apis/marketplace-api/getAxieDetails"
 import { createErrorEmbed } from "@client/components/embeds"
 import axieClassProps from "@constants/props/axie-class-props.json"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
+import { isAPIError } from "@utils/isAPIError"
 import { ApplicationCommandOptionType, ColorResolvable, EmbedBuilder, PermissionsBitField } from "discord.js"
 
 const command: SlashCommand = {
@@ -32,13 +33,13 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const axie = await getAxieDetails(axieId)
 
-	if (!axie) {
-		const failedEmbed = createErrorEmbed({
-			title: translate("errors.request_failed.failed.title"),
+	if (!axie || isAPIError(axie)) {
+		const requestFailedEmbed = createErrorEmbed({
+			title: translate("errors.request_failed.title"),
 			description: translate("errors.request_failed.description", { axieId }),
 		})
 
-		await interaction.editReply({ embeds: [failedEmbed] }).catch(() => {})
+		await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
 		return
 	}
 

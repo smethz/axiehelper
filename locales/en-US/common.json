@@ -36,7 +36,7 @@
 			"description": "Please provide a **Valid User ID** or **Ronin Address** format."
 		},
 		"invalid_profile": {
-			"title": "Invalid User ID or Ronin Address Provided",
+			"title": "No Profile",
 			"description": "The User ID or Ronin Address provided doesn't have a valid profile."
 		},
 		"missing_perms": {
