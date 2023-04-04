@@ -9,17 +9,17 @@ import { componentFilter } from "@utils/componentFilter"
 import { currencyFormatter } from "@utils/currencyFormatter"
 import { getCharmsList } from "@utils/getItemList"
 import {
-	ActionRowBuilder,
 	APIMessageComponentEmoji,
 	APISelectMenuOption,
+	ActionRowBuilder,
 	ApplicationCommandOptionType,
 	ColorResolvable,
 	ComponentType,
 	EmbedBuilder,
-	parseEmoji,
 	PermissionsBitField,
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 	StringSelectMenuBuilder,
+	parseEmoji,
 } from "discord.js"
 import Fuse from "fuse.js"
 
@@ -63,7 +63,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	const charmsList = getCharmsList()
+	const charmsList = getCharmsList().filter((charm) => charm.item.id.endsWith("_nft"))
 
 	const charmFoundById = charmsList.find((charm) => charm.item.id === charmToFind)
 
@@ -205,7 +205,7 @@ async function autocomplete({ interaction }: AutoCompleteParams) {
 	const focusedValue = interaction.options.getFocused()
 
 	if (!focusedValue) {
-		const charmsList = getCharmsList()
+		const charmsList = getCharmsList().filter((charm) => charm.item.id.endsWith("_nft"))
 		await interaction.respond(
 			charmsList
 				.sort((a, b) => {
@@ -243,7 +243,7 @@ async function autocomplete({ interaction }: AutoCompleteParams) {
 }
 
 function findCharms(charmName: string) {
-	const charmsList = getCharmsList()
+	const charmsList = getCharmsList().filter((charm) => charm.item.id.endsWith("_nft"))
 
 	const options = {
 		threshold: 0.4,

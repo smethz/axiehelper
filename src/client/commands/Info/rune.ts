@@ -9,17 +9,17 @@ import { componentFilter } from "@utils/componentFilter"
 import { currencyFormatter } from "@utils/currencyFormatter"
 import { getRunesList } from "@utils/getItemList"
 import {
-	ActionRowBuilder,
 	APIMessageComponentEmoji,
 	APISelectMenuOption,
+	ActionRowBuilder,
 	ApplicationCommandOptionType,
 	ColorResolvable,
 	ComponentType,
 	EmbedBuilder,
-	parseEmoji,
 	PermissionsBitField,
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 	StringSelectMenuBuilder,
+	parseEmoji,
 } from "discord.js"
 import Fuse from "fuse.js"
 
@@ -63,7 +63,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	const runeList = getRunesList()
+	const runeList = getRunesList().filter((rune) => rune.item.id.endsWith("_nft"))
 
 	const runeFoundById = runeList.find((rune) => rune.item.id === runeToFind)
 
@@ -200,7 +200,7 @@ async function autocomplete({ interaction }: AutoCompleteParams) {
 	const focusedValue = interaction.options.getFocused()
 
 	if (!focusedValue) {
-		const runesList = getRunesList()
+		const runesList = getRunesList().filter((rune) => rune.item.id.endsWith("_nft"))
 		await interaction.respond(
 			runesList
 				.sort((a, b) => {
@@ -238,7 +238,7 @@ async function autocomplete({ interaction }: AutoCompleteParams) {
 }
 
 function findRunes(runeName: string) {
-	const runeList = getRunesList()
+	const runeList = getRunesList().filter((rune) => rune.item.id.endsWith("_nft"))
 
 	const options = {
 		threshold: 0.4,
