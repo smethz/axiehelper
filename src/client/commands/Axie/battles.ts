@@ -142,7 +142,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		collector.on("collect", async (battleMenuInteraction) => {
 			await battleMenuInteraction.deferUpdate()
 
-			// get selected battle id
 			const selectedBattle = playerBattles.battles.find(
 				(battle) => battle.battle_uuid === battleMenuInteraction.values[0]
 			)
@@ -151,6 +150,9 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			await battleMenuInteraction.editReply({ components: [battleSelectionMenu] }).catch(() => {})
 
 			const selectedMenu = createBattleSelection(playerBattles.battles, selectedBattle?.battleIndex)
+
+			const rpsWinner = await getBattleReplay(selectedBattle!.battle_uuid)
+			if (rpsWinner) selectedBattle!.rps_winner = rpsWinner
 
 			const battleEmbed = await createBattleEmbed(selectedBattle!)
 
@@ -404,17 +406,24 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			  )})`
 			: `${battle.opponent.userId}`
 
-		const rewardsValue =
-			battle.result === "Defeated"
-				? `${battle.player.rewards?.old_vstar} ➡ ${battle.player.rewards?.new_vstar}\n${battle.player.rewards?.vstar_gained} ${emojis.victory_star}`
-				: `${battle.player.rewards?.old_vstar} ➡ ${battle.player.rewards?.new_vstar}\n${battle.player.rewards?.vstar_gained} ${emojis.victory_star}\n${battle.player.rewards?.slp_gained} ${emojis.tokens.slp}\n${battle.player.rewards?.moonshard_gained} ${emojis.moonshard}`
+		let rewardsValue = `${battle.player.rewards?.old_vstar} ➡ ${battle.player.rewards?.new_vstar}`
+		rewardsValue += `\n${battle.player.rewards?.vstar_gained} ${emojis.victory_star}`
 
-		const battleInitiator = translate("battle_initiator", {
-			context: battle.rps_winner === battle.player.userId ? "player" : "opponent",
-		})
+		if (battle.result === "Victory") {
+			rewardsValue += `\n${battle.player.rewards?.slp_gained} ${emojis.tokens.slp}`
+			rewardsValue += `\n${battle.player.rewards?.moonshard_gained} ${emojis.moonshard}`
+		}
+
+		let battleInitiator = ""
+		if (battle.rps_winner) {
+			battleInitiator += `\n`
+			battleInitiator += translate("battle_initiator", {
+				context: battle.rps_winner === battle.player.userId ? "player" : "opponent",
+			})
+		}
 
 		return new EmbedBuilder()
-			.setDescription(playerIdentifier + "\n" + battleInitiator)
+			.setDescription(playerIdentifier + battleInitiator)
 			.addFields({
 				name: translate("watch_field.name"),
 				value: translate("watch_field.value", {
@@ -479,11 +488,13 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			const parsed_moonshard_gained =
 				(battle.player.rewards!.moonshard_gained <= 0 ? "" : "+") + battle.player.rewards!.moonshard_gained
 
-			let rowLabel =
-				`${battle.battleIndex + 1}.` + ` ${translate(`results.${battle.result}`)}` + ` | ${format_vstar_gained} V.Star`
+			let rowLabel = `${battle.battleIndex + 1}.`
+			rowLabel += ` ${translate(`results.${battle.result}`)}`
+			rowLabel += ` | ${format_vstar_gained} V.Star`
 
 			if (battle.result === "Victory") {
-				rowLabel += ` | ${parsed_slp_gained} SLP` + ` | ${parsed_moonshard_gained} M.Shards`
+				rowLabel += ` | ${parsed_slp_gained} SLP`
+				rowLabel += ` | ${parsed_moonshard_gained} M.Shards`
 			}
 
 			const parsedBattleType = {

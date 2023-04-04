@@ -1,24 +1,27 @@
 import { cache } from "@services/cache"
-import { VALID_UUID_REGEX } from "@utils/validateAddress"
 import axios, { AxiosError } from "axios"
 import logger from "pino-logger"
 
-export async function getBattleReplay(replayId: string): Promise<string | void> {
-	const cacheKey = `battle_replay:${replayId}`
+const VALID_UUID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/i
+
+export async function getBattleReplay(battleId: string): Promise<string | void> {
+	const cacheKey = `battle_replay:${battleId}`
 	const cachedEntry = await cache.get(cacheKey)
 
 	if (cachedEntry) return cachedEntry
 
-	const replay = await axios
-		.get<string>(`https://storage.googleapis.com/sm-prod-origin-battle-replay/pvp_battle_replay/${replayId}`)
+	const url = `https://storage.googleapis.com/sm-prod-origin-battle-replay/pvp_battle_replay/${battleId}`
+
+	const battleReplay = await axios
+		.get<string>(url)
 		.then((response) => response.data)
 		.catch((error: AxiosError) => {
-			logger.error(error, `Failed to retrieve battle replay - ${replayId}`)
+			logger.error(error, `Failed to retrieve battle replay - ${battleId}`)
 		})
 
-	if (!replay) return
+	if (!battleReplay) return
 
-	const rpsWinner = replay.match(VALID_UUID_REGEX)
+	const rpsWinner = battleReplay.match(VALID_UUID_REGEX)
 
 	if (!rpsWinner) return
 
