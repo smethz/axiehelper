@@ -7,7 +7,7 @@ import {
 	sendNoSavedProfilesError,
 } from "@client/components/embeds"
 import { createProfileSelectMenu } from "@client/components/selection"
-import { DEFAULT_IDLE_TIME, LATEST_SEASON_ID } from "@constants/index"
+import { DEFAULT_IDLE_TIME } from "@constants/index"
 import emojis from "@constants/props/emojis.json"
 import crafting_table from "@constants/props/exp-table.json"
 import { ParsedPlayerBattles } from "@custom-types/battle"
@@ -224,8 +224,8 @@ function createStatsEmbed(
 	let playerRunesAndCharmsField: APIEmbedField[] = []
 	if (playerInventory) {
 		const parsedInventory = parseInventory(playerInventory).filter((item) => {
-			if (item.charm) return item.charm.season?.id === LATEST_SEASON_ID
-			if (item.rune) return item.rune.season?.id === LATEST_SEASON_ID
+			if (item.charm) return item.charm.season?.id === globalThis.CURRENT_SEASON_ID
+			if (item.rune) return item.rune.season?.id === globalThis.CURRENT_SEASON_ID
 			return
 		})
 

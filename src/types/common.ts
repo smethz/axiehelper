@@ -11,4 +11,5 @@ export interface Metadata {
 declare global {
 	var isClientReady: boolean
 	var tokensPrice: ItemMinimumPrice[]
+	var CURRENT_SEASON_ID: number
 }

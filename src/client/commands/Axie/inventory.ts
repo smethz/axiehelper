@@ -9,7 +9,7 @@ import {
 } from "@client/components/embeds"
 import { createPages, createPaginationButtons, getFooter, getPageIndex } from "@client/components/pagination"
 import { PROFILE_SELECTOR_ID, createProfileSelectMenu } from "@client/components/selection"
-import { DEFAULT_IDLE_TIME, LATEST_SEASON_ID } from "@constants/index"
+import { DEFAULT_IDLE_TIME } from "@constants/index"
 import axieClassProps from "@constants/props/axie-class-props.json"
 import emojis from "@constants/props/emojis.json"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
@@ -363,7 +363,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		message.edit({ components: [paginationButtons, filterMenu, profileSelector] }).catch(() => {})
 	})
 
-	function createFilterMenu(activeFilters: string[] = [`season-${LATEST_SEASON_ID}`]) {
+	function createFilterMenu(activeFilters: string[] = [`season-${globalThis.CURRENT_SEASON_ID}`]) {
 		const classOptions: APISelectMenuOption[] = Object.values(ItemClass).map((axieClass) => {
 			const emoji = axieClassProps[axieClass.toLowerCase() as keyof typeof axieClassProps].emoji
 			const pasrsedEmoji = parseEmoji(emoji) as APIMessageComponentEmoji
@@ -385,7 +385,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			}
 		})
 
-		const seasonOptions: APISelectMenuOption[] = Array.from({ length: LATEST_SEASON_ID }, (_, index) => {
+		const seasonOptions: APISelectMenuOption[] = Array.from({ length: globalThis.CURRENT_SEASON_ID }, (_, index) => {
 			return {
 				label: translate("labels.season", { seasonId: index.toString() }),
 				value: `season-${index + 1}`,
@@ -487,7 +487,7 @@ function createInventoryEmbed(pages: string[], currentPage: number, locale: stri
 	return inventoryEmbed
 }
 
-function filterInventory(playerInventory: PlayerItems, tags: string[] = [`season-${LATEST_SEASON_ID}`]) {
+function filterInventory(playerInventory: PlayerItems, tags: string[] = [`season-${globalThis.CURRENT_SEASON_ID}`]) {
 	const seasons = tags.filter((tag) => tag.startsWith("season")).map((tag) => parseInt(tag.split("-")[1] as string))
 	const rarities = tags.filter((tag) => tag.startsWith("rarity")).map((tag) => tag.split("-")[1])
 	const classes = tags.filter((tag) => tag.startsWith("class")).map((tag) => tag.split("-")[1])
@@ -495,7 +495,7 @@ function filterInventory(playerInventory: PlayerItems, tags: string[] = [`season
 	const nextWithdrawTime = tags.find((tag) => tag === "nextWithdrawTime") === "nextWithdrawTime"
 	const itemType = tags.filter((tag) => tag === "charm" || tag === "rune")
 
-	const defaultSeasons = Array.from({ length: LATEST_SEASON_ID }, (_, index) => index + 1)
+	const defaultSeasons = Array.from({ length: globalThis.CURRENT_SEASON_ID }, (_, index) => index + 1)
 	const defaultRarities = Object.values(ItemRarity)
 	const defaultClasses = Object.values(ItemClass)
 

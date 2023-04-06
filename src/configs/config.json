@@ -6,6 +6,5 @@
 	"CLIENT_INVITE_URL": "https://discord.com/api/oauth2/authorize?client_id=847826282389569556&permissions=277025770560&scope=bot",
 	"GUILD_INVITE_URL": "https://discord.com/invite/xyWaa4rRBy",
 	"NUM_OF_MAX_LEADERBOARD_PLAYERS": 1000,
-	"NUM_OF_MAX_SAVED_PROFILES": 50,
-	"CURRENT_SEASON_ID": 4
+	"NUM_OF_MAX_SAVED_PROFILES": 50
 }
