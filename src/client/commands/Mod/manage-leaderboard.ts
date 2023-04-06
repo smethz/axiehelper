@@ -394,7 +394,7 @@ async function handleAdd(
 	// Invalid IDs due to formatting
 	const invalidFormat_IDs = providedIDs.filter((id) => !validFormat_IDs.includes(id))
 
-	let uniqueValidIDs = [...new Set(validFormat_IDs)]
+	const uniqueValidIDs = [...new Set(validFormat_IDs)]
 	const parsedUniqueValidIDs = parseUniqueIDs(uniqueValidIDs, dbGuild) // Removed duplicates of ronin address and user id
 
 	// IDs that are already in the leaderboard

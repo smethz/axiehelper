@@ -185,8 +185,8 @@ function pickRandomGameMode() {
 }
 
 function getRandomAxieID() {
-	let min = Math.ceil(5)
-	let max = Math.floor(11_000_000)
+	const min = Math.ceil(5)
+	const max = Math.floor(11_000_000)
 
 	return Math.floor(Math.random() * (max - min) + min) // The maximum is exclusive and the minimum is inclusive
 }

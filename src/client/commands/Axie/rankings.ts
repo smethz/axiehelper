@@ -91,12 +91,12 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		let parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
 
-		let maxPage = Math.floor(arenaLeaderboard._metadata.total / numOfPlayersPerPage) || 1
+		const maxPage = Math.floor(arenaLeaderboard._metadata.total / numOfPlayersPerPage) || 1
 		let pageIndex = leaderboardPage - 1
 		let pages = createPages(parsedLeaderboard)
 		let paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
 
-		let rankingsEmbed = new EmbedBuilder()
+		const rankingsEmbed = new EmbedBuilder()
 			.setTitle(translate("leaderboard"))
 			.setURL(`${AXIES_IO_URL}/leaderboard`)
 			.setDescription(pages[0] as string)
@@ -154,7 +154,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	// Event Leaderboard
 	const constestList = await getContest()
-	let latestContest = constestList[0]
+	const latestContest = constestList[0]
 	if (!latestContest) {
 		await interaction.editReply({ embeds: [requestFailedEmbed] }).catch(() => {})
 		return
@@ -175,12 +175,12 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const isContestEnded = latestContest!.end_time < Date.now() / 1000
 
-	let timestamp = translate("timestamp", {
+	const timestamp = translate("timestamp", {
 		context: isContestEnded ? "ended" : "",
 		time: latestContest.end_time,
 	})
 
-	let maxPage = Math.floor(contestLeaderboard.total / numOfPlayersPerPage) || 1
+	const maxPage = Math.floor(contestLeaderboard.total / numOfPlayersPerPage) || 1
 	let pageIndex = leaderboardPage - 1
 	let pages = createPages(parsedLeaderboard)
 	let paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })

@@ -122,7 +122,7 @@ async function execute({ interaction, client, translate }: CommandExecuteParams)
 
 	const categoryMenuSelector = createSelectionMenu(categoryMenuOptions)
 
-	let commandEmbed = new EmbedBuilder()
+	const commandEmbed = new EmbedBuilder()
 		.setDescription(pages[pageIndex] as string)
 		.setFooter({ text: getFooter(pageIndex, pages, interaction.locale) })
 		.setColor("Random")

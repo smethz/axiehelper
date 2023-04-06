@@ -107,7 +107,7 @@ export async function getPageIndex(buttonInteraction: ButtonInteraction, pageInd
 				.then(async (modalInteraction) => {
 					if (!modalInteraction.deferred) await modalInteraction.deferUpdate()
 
-					let pageInput = modalInteraction.fields.getTextInputValue("pageInput")
+					const pageInput = modalInteraction.fields.getTextInputValue("pageInput")
 
 					const rawPageIndex = parseInt(pageInput)
 

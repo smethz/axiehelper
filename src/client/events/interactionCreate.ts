@@ -22,7 +22,7 @@ export default async function (interaction: Interaction, client: Client) {
 		return
 	}
 
-	let commandName = interaction.isModalSubmit()
+	const commandName = interaction.isModalSubmit()
 		? (interaction.customId.split("-")[0] as string)
 		: interaction.commandName
 

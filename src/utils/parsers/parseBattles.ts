@@ -47,9 +47,9 @@ export function parseArenaBattle(
 
 	const vstar_gained = playerRewards?.new_vstar ? playerRewards.new_vstar - playerRewards.old_vstar : 0
 
-	let slp_gained = playerRewards?.items.find((item) => item.item_id == "slp")?.quantity
+	const slp_gained = playerRewards?.items.find((item) => item.item_id == "slp")?.quantity
 
-	let moonshard_gained = playerRewards?.items
+	const moonshard_gained = playerRewards?.items
 		.filter((item) => item.item_id === "moonshard")
 		.reduce((previousVal, currentVal) => previousVal + currentVal.quantity, 0)
 
@@ -60,8 +60,8 @@ export function parseArenaBattle(
 		rank: battle.user_ranks[playerIndex]!,
 		rewards: {
 			vstar_gained,
-			slp_gained: (slp_gained ??= 0),
-			moonshard_gained: (moonshard_gained ??= 0),
+			slp_gained: slp_gained ?? 0,
+			moonshard_gained: moonshard_gained ?? 0,
 			new_vstar: playerRewards?.new_vstar,
 			old_vstar: playerRewards?.old_vstar,
 		},

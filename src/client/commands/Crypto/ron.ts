@@ -108,9 +108,8 @@ async function execute({ interaction, translate }: CommandExecuteParams) {
 		currencyTicker = userPreferredCurrency?.settings?.currency ? userPreferredCurrency.settings.currency : "USD"
 	}
 
-	let amount
-	if (interaction.options.getNumber("amount")) amount = interaction.options.getNumber("amount")
-
+	const amountInput = interaction.options.getNumber("number")
+	const amount = amountInput ? amountInput : null
 	const ron = await getTokenPrice("ron", currencyTicker)
 
 	if (!ron) {

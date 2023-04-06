@@ -40,17 +40,17 @@ export function currencyFormatter(ticker: string, amount: number, price: number)
 				}).format(amount * price)
 			}
 			case currency.style === 1: {
-				let value = (amount * price).toFixed(0)
+				const value = (amount * price).toFixed(0)
 
 				return currency.prefix + value + currency.suffix
 			}
 			case currency.style === 2: {
-				let value = ((amount * price) / 1000).toFixed(0)
+				const value = ((amount * price) / 1000).toFixed(0)
 
 				return currency.prefix + value + "k" + currency.suffix
 			}
 			default: {
-				let value = Math.round(amount * price)
+				const value = Math.round(amount * price)
 
 				return currency.prefix + value + currency.suffix
 			}

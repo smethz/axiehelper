@@ -79,8 +79,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 async function validateModal({ interaction, translate }: InteractionModalParams): Promise<void> {
 	await interaction.deferReply()
 
-	let playerId = interaction.fields.getTextInputValue("userIdInput")
-	let customName = interaction.fields.getTextInputValue("nameInput")
+	const playerId = interaction.fields.getTextInputValue("userIdInput")
+	const customName = interaction.fields.getTextInputValue("nameInput")
 
 	if (!isValidClientID(playerId) && !isValidRoninAddress(playerId)) {
 		const invalidEmbed = createErrorEmbed({
