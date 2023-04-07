@@ -1,12 +1,10 @@
 import "dotenv/config"
 import "module-alias/register"
 
-import { CLIENT_ID, DEV_CLIENT_ID, GUILD_ID } from "@configs/config.json"
 import { REST, Routes } from "discord.js"
-
 import logger from "pino-logger"
 import Client from "./client"
-import { isDevelopment } from "./constants"
+import { CLIENT_ID, DEV_CLIENT_ID, GUILD_ID, isDevelopment } from "./constants"
 
 const client = new Client()
 

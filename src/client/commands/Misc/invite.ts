@@ -1,4 +1,4 @@
-import { CLIENT_INVITE_URL, GUILD_INVITE_URL } from "@configs/config.json"
+import { CLIENT_INVITE_URL, GUILD_INVITE_URL } from "@constants/index"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
 import {
 	ActionRowBuilder,

@@ -1,5 +1,5 @@
 import { createErrorEmbed } from "@client/components/embeds"
-import { OWNER_IDS } from "@configs/config.json"
+import { OWNER_IDS } from "@constants/index"
 import { Interaction } from "discord.js"
 import i18next, { TOptions } from "i18next"
 import logger from "pino-logger"
