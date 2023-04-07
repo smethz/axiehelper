@@ -1,7 +1,7 @@
 import { getSeasons } from "@apis/game-api/getSeasons"
 
 export async function updateSeason() {
-	const originSeasons = await getSeasons()
+	const originSeasons = await getSeasons({ force: true })
 
 	if (!originSeasons) throw new Error(`Failed to update to the latest season`)
 
