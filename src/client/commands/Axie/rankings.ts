@@ -1,6 +1,7 @@
 import { getContest } from "@apis/contest-api/getContest"
 import { getContestLeaderboard } from "@apis/contest-api/getContestLeaderboard"
 import { getLeaderboard } from "@apis/game-api/getLeaderboard"
+import { getSeasons } from "@apis/game-api/getSeasons"
 import { createErrorEmbed } from "@client/components/embeds"
 import {
 	createPages,
@@ -89,6 +90,22 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			return
 		}
 
+		const seasons = await getSeasons()
+
+		let seasonTimestamp = ``
+
+		if (seasons) {
+			const seasonIds = seasons.map((season) => season.id ?? -Infinity)
+			const latestSeason = seasons.find((season) => season.id === Math.max(...seasonIds))
+			const isSeasonEnded = latestSeason!.endedAt < Date.now() / 1000
+
+			seasonTimestamp = translate("season_timestamp", {
+				context: isSeasonEnded ? "ended" : "ongoing",
+				seasonName: latestSeason?.name,
+				timestamp: latestSeason?.endedAt,
+			})
+		}
+
 		let parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
 
 		const maxPage = Math.floor(arenaLeaderboard._metadata.total / numOfPlayersPerPage) || 1
@@ -99,7 +116,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		const rankingsEmbed = new EmbedBuilder()
 			.setTitle(translate("leaderboard"))
 			.setURL(`${AXIES_IO_URL}/leaderboard`)
-			.setDescription(pages[0] as string)
+			.setDescription(`${seasonTimestamp}\n`.concat(pages[0] as string))
 			.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
 			.setColor("Random")
 
@@ -135,7 +152,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
 
 			rankingsEmbed
-				.setDescription(pages[0] as string)
+				.setDescription(`${seasonTimestamp}\n`.concat(pages[0] as string))
 				.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
 				.setTimestamp()
 				.setColor("Random")
@@ -175,7 +192,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const isContestEnded = latestContest!.end_time < Date.now() / 1000
 
-	const timestamp = translate("timestamp", {
+	const constestTimestamp = translate("contest_timestamp", {
 		context: isContestEnded ? "ended" : "",
 		time: latestContest.end_time,
 	})
@@ -188,7 +205,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	const contestEmbed = new EmbedBuilder()
 		.setTitle(latestContest.name)
 		.setURL(latestContest.event_url)
-		.setDescription(`${timestamp}\n`.concat(pages[0] as string))
+		.setDescription(`${constestTimestamp}\n`.concat(pages[0] as string))
 		.setThumbnail(latestContest.mobile_image_url)
 		.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
 		.setTimestamp()
@@ -232,7 +249,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		const contestEmbed = new EmbedBuilder()
 			.setTitle(latestContest!.name)
 			.setURL(latestContest!.event_url)
-			.setDescription(`${timestamp}\n`.concat(pages[0] as string))
+			.setDescription(`${constestTimestamp}\n`.concat(pages[0] as string))
 			.setThumbnail(latestContest!.mobile_image_url)
 			.setFooter({ text: getFooter(pageIndex, maxPage, interaction.locale) })
 			.setTimestamp()

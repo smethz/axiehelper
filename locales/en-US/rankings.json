@@ -24,8 +24,10 @@
 		}
 	},
 	"leaderboard": "Axie Infinity Leaderboard",
-	"timestamp": "**Ends** <t:{{time}}:R>",
-	"timestamp_ended": "**Ended** <t:{{time}}:R>",
+	"season_timestamp_ongoing": "**{{seasonName}} ends <t:{{timestamp}}:R>**",
+	"season_timestamp_ended": "**{{seasonName}} ended <t:{{timestamp}}:R>**",
+	"contest_timestamp": "**Ends** <t:{{time}}:R>",
+	"contest_timestamp_ended": "**Ended** <t:{{time}}:R>",
 	"error": "Couldn't fetch the leaderboard. Please try again later.",
 	"errors": {
 		"request_failed": {
