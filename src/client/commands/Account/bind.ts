@@ -126,7 +126,7 @@ async function validateModal({ interaction, translate }: InteractionModalParams)
 								id: profileDetails.userID,
 							},
 							create: {
-								id: playerId,
+								id: profileDetails.userID,
 								name: profileDetails.name,
 								roninAddress: profileDetails.roninAddress,
 							},
