@@ -62,7 +62,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			title: translate("errors.empty_leaderboard.title", {
 				guildName: interaction.guild.name,
 			}),
-			description: translate("errors.empty_leaderboard.title"),
+			description: translate("errors.empty_leaderboard.description"),
 		})
 		await interaction.editReply({ embeds: [errorEmbed] }).catch(() => {})
 		return
