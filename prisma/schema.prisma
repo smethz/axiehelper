@@ -51,8 +51,6 @@ model PlayerProfile {
     createdAt      DateTime       @default(now())
     updatedAt      DateTime       @updatedAt
     guild          Guild[]
-
-    @@index([roninAddress])
 }
 
 // Discord User Saved Profiles
