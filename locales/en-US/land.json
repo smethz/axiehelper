@@ -1,0 +1,33 @@
+{
+    "name": "land",
+    "description": "Shows the information of the specified Land",
+    "options": {
+        "column": {
+            "name": "column",
+            "description": "The land column number"
+        },
+        "row": {
+            "name": "row",
+            "description": "The land row number"
+        }
+    },
+    "land_title": "{{landType}} plot ({{column}}, {{row}})",
+    "unclaimed_plot": "Unclaimed plot ({{column}}, {{row}})",
+    "owner": "Owner",
+    "price": "Price",
+    "highest_offer_price": "Highest Offer Price",
+    "highest_bidder": "Highest Bidder",
+    "total_offers": "Total Offers",
+    "modal": {
+        "title": "Navigate Land",
+        "column_label": "Go to Column",
+        "row_label": "Go to Row"
+    },
+    "errors": {
+        "request_failed": {
+            "title": "Request Failed",
+            "description": "Couldn't retrieve land **{{column}}, {{row}}**"
+        },
+        "invalid_coords": "Please input a valid range of coordinates from -150 to 150"
+    }
+}

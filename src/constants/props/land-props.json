@@ -1,0 +1,27 @@
+{
+    "Arctic": {
+        "color": "#c9dee2",
+        "emoji": "<:arctic_marker:1094614368869691443>",
+        "image": "https://i.imgur.com/Z4rjQeF.png"
+    },
+    "Forest": {
+        "color": "#91b80f",
+        "emoji": "<:forest_marker:1094632087539159100>",
+        "image": "https://i.imgur.com/NtifN5c.png"
+    },
+    "Savannah": {
+        "color": "#dd8a0e",
+        "emoji": "<:savannah_marker:1094632083655249971> ",
+        "image": "https://i.imgur.com/ivi7rGV.png"
+    },
+    "Mystic": {
+        "color": "#4f9fb0",
+        "emoji": "<:mystic_marker:1094622213535191070>",
+        "image": "https://i.imgur.com/rsLJ3XN.png"
+    },
+    "Genesis": {
+        "color": "#12557a",
+        "emoji": "<:genesis_marker:1094632079796486285>",
+        "image": "https://i.imgur.com/GIA9Rej.png"
+    }
+}
