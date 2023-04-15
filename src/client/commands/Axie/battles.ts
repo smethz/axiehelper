@@ -140,14 +140,12 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		})
 
 		collector.on("collect", async (battleMenuInteraction) => {
-			await battleMenuInteraction.deferUpdate()
+			disableComponents(battleSelectionMenu)
+			await battleMenuInteraction.update({ components: [battleSelectionMenu] }).catch(() => {})
 
 			const selectedBattle = playerBattles.battles.find(
 				(battle) => battle.battle_uuid === battleMenuInteraction.values[0]
 			)
-
-			battleSelectionMenu.components[0]?.setDisabled(true)
-			await battleMenuInteraction.editReply({ components: [battleSelectionMenu] }).catch(() => {})
 
 			const selectedMenu = createBattleSelection(playerBattles.battles, selectedBattle?.battleIndex)
 
@@ -230,20 +228,14 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	})
 
 	collector.on("collect", async (selectMenuInteraction) => {
-		await selectMenuInteraction.deferUpdate()
+		disableComponents(battleSelector, profileSelector)
+		await selectMenuInteraction.update({ components: [battleSelector, profileSelector] }).catch(() => {})
+
 		// Change Battle
 		if (selectMenuInteraction.customId === "selected-battle") {
 			const selectedBattle = (playerBattles as ParsedPlayerBattles).battles.find(
 				(battle) => battle.battle_uuid === selectMenuInteraction.values[0]
 			)
-
-			disableComponents(battleSelector, profileSelector)
-
-			await selectMenuInteraction
-				.editReply({
-					components: [battleSelector, profileSelector],
-				})
-				.catch(() => {})
 
 			battleSelector = createBattleSelection(
 				(playerBattles as ParsedPlayerBattles).battles,
@@ -283,14 +275,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			const selectedProfile = user.savedProfiles.find(
 				(profile) => profile.profileId === selectMenuInteraction.values[0]
 			)
-
-			disableComponents(battleSelector, profileSelector)
-
-			await selectMenuInteraction
-				.editReply({
-					components: [battleSelector, profileSelector],
-				})
-				.catch(() => {})
 
 			playerBattles = await getPlayerBattles(selectMenuInteraction.values[0]!)
 

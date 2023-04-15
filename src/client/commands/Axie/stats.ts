@@ -156,10 +156,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	})
 
 	collector.on("collect", async (componentInteraction) => {
-		await componentInteraction.deferUpdate()
-
 		disableComponents(profileSelector)
-		await componentInteraction.editReply({ components: [profileSelector] }).catch(() => {})
+		await componentInteraction.update({ components: [profileSelector] }).catch(() => {})
 
 		const selectedProfile = dbUser.savedProfiles.find((profile) => profile.profileId === componentInteraction.values[0])
 
