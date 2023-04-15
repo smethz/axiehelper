@@ -135,9 +135,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		collector.on("collect", async (buttonInteraction) => {
 			pageIndex = await getPageIndex(buttonInteraction, pageIndex, maxPage)
 
-			disableComponents(paginationButtons)
-			await buttonInteraction.editReply({ components: [paginationButtons] }).catch(() => {})
-
 			arenaLeaderboard = await getLeaderboard({ offset: pageIndex * 20 })
 
 			if (!arenaLeaderboard || isAPIError(arenaLeaderboard)) {
@@ -225,9 +222,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	collector.on("collect", async (buttonInteraction) => {
 		pageIndex = await getPageIndex(buttonInteraction, pageIndex, maxPage)
-
-		disableComponents(paginationButtons)
-		await buttonInteraction.editReply({ components: [paginationButtons] }).catch(() => {})
 
 		contestLeaderboard = await getContestLeaderboard({
 			constestId: latestContest!.id,

@@ -87,9 +87,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	collector.on("collect", async (buttonInteraction) => {
 		const [currentColumn, currentRow] = await getCurrentCoords(column, row, buttonInteraction)
 
-		disableComponents(navigationButtons)
-		await buttonInteraction.editReply({ components: [navigationButtons] })
-
 		column = currentColumn
 		row = currentRow
 

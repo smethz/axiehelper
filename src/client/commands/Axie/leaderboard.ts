@@ -8,7 +8,7 @@ import { PlayerItem } from "@custom-types/items"
 import { Division, ParsedPlayerIngameProfile, PlayerLeaderboardData, Tier } from "@custom-types/profile"
 import { ActionRowBuilder, StringSelectMenuBuilder } from "@discordjs/builders"
 import { componentFilter } from "@utils/componentFilter"
-import { disableComponents, enableComponents } from "@utils/componentsToggler"
+import { disableComponents } from "@utils/componentsToggler"
 import { numberFormatter } from "@utils/currencyFormatter"
 import { getGuildLeaderboard } from "@utils/dbFunctions"
 import { getOverallStats } from "@utils/getOverallStats"
@@ -176,11 +176,6 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			filterSelector.components[0]?.options
 				.filter((option) => option.data.value === componentInteraction.values[0])[0]
 				?.setDefault(true)
-
-			disableComponents(filterSelector, paginationButtons)
-			await componentInteraction.editReply({ components: [filterSelector, paginationButtons] }).catch(() => {})
-
-			enableComponents(filterSelector, paginationButtons)
 
 			const sortType = componentInteraction.values[0]
 
