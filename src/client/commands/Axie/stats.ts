@@ -14,6 +14,7 @@ import { ParsedPlayerBattles } from "@custom-types/battle"
 import { CommandExecuteParams, SlashCommand, TranslateFunction } from "@custom-types/command"
 import { PlayerItem } from "@custom-types/items"
 import { ParsedPlayerIngameProfile, PlayerLeaderboardData } from "@custom-types/profile"
+import { createVStarChartCanvas } from "@utils/canvas"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents } from "@utils/componentsToggler"
 import { numberFormatter } from "@utils/currencyFormatter"
@@ -26,9 +27,11 @@ import { determineAddress, isValidClientID, isValidRoninAddress } from "@utils/v
 import {
 	APIEmbedField,
 	ApplicationCommandOptionType,
+	AttachmentBuilder,
 	Collection,
 	ComponentType,
 	EmbedBuilder,
+	InteractionEditReplyOptions,
 	PermissionsBitField,
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord.js"
@@ -113,7 +116,17 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			translate
 		)
 
-		await interaction.editReply({ embeds: [playerStatsEmbed] }).catch(() => {})
+		let replyOptions: InteractionEditReplyOptions = {
+			embeds: [playerStatsEmbed],
+		}
+
+		if (playerStats.battles?.battles) {
+			const vstarAttachment = await createVStarAttachment(playerStats.battles)
+			playerStatsEmbed.setImage("attachment://vstar_history.png")
+			replyOptions = { ...replyOptions, files: [vstarAttachment] }
+		}
+
+		await interaction.editReply(replyOptions).catch(() => {})
 		return
 	}
 
@@ -135,8 +148,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	// Create Player Stats Embed
-	const playerStatsEmbed = createStatsEmbed(
+	let playerStatsEmbed = createStatsEmbed(
 		playerStats.profile,
 		playerStats.leaderboard,
 		playerStats.battles,
@@ -146,10 +158,18 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	let profileSelector = createProfileSelectMenu(dbUser.savedProfiles)
 
-	const message = await interaction.editReply({
+	let replyOptions: InteractionEditReplyOptions = {
 		embeds: [playerStatsEmbed],
 		components: [profileSelector],
-	})
+	}
+
+	if (playerStats.battles?.battles) {
+		const vstarAttachment = await createVStarAttachment(playerStats.battles)
+		playerStatsEmbed.setImage("attachment://vstar_history.png")
+		replyOptions = { ...replyOptions, files: [vstarAttachment] }
+	}
+
+	const message = await interaction.editReply(replyOptions)
 	const collector = message.createMessageComponentCollector<ComponentType.StringSelect>({
 		filter: componentFilter(interaction),
 		idle: DEFAULT_IDLE_TIME,
@@ -168,7 +188,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			return
 		}
 
-		const playerStatsEmbed = createStatsEmbed(
+		playerStatsEmbed = createStatsEmbed(
 			playerStats.profile,
 			playerStats.leaderboard,
 			playerStats.battles,
@@ -178,7 +198,18 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		profileSelector = createProfileSelectMenu(dbUser.savedProfiles, selectedProfile)
 
-		await componentInteraction.editReply({ embeds: [playerStatsEmbed], components: [profileSelector] }).catch(() => {})
+		replyOptions = {
+			embeds: [playerStatsEmbed],
+			components: [profileSelector],
+		}
+
+		if (playerStats.battles?.battles) {
+			const vstarAttachment = await createVStarAttachment(playerStats.battles)
+			playerStatsEmbed.setImage("attachment://vstar_history.png")
+			replyOptions = { ...replyOptions, files: [vstarAttachment], attachments: [] }
+		}
+
+		await componentInteraction.editReply(replyOptions).catch(() => {})
 	})
 
 	collector.on("end", () => {
@@ -324,4 +355,14 @@ function createBattleFields(playerBattles: ParsedPlayerBattles, translate: Trans
 			inline: true,
 		},
 	]
+}
+
+async function createVStarAttachment(playerBattles: ParsedPlayerBattles) {
+	const vstarHistoryCanvas = await createVStarChartCanvas(playerBattles)
+
+	const vstarCanvasAttachment = new AttachmentBuilder(vstarHistoryCanvas, {
+		name: "vstar_history.png",
+	})
+
+	return vstarCanvasAttachment
 }

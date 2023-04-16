@@ -7,3 +7,4 @@ canvas.registerFont("./assets/fonts/Changa-One.ttf", { family: "ChangaOne" })
 export * from "./createAxieCanvas"
 export * from "./createBattleCanvas"
 export * from "./createCardCanvas"
+export * from "./createVStarChartCanvas"
