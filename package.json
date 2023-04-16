@@ -29,6 +29,9 @@
 		"axios": "^0.26.1",
 		"canvas": "^2.9.1",
 		"canvas-constructor": "^6.0.2",
+		"chart.js": "^3.9.1",
+		"chartjs-node-canvas": "^4.1.6",
+		"chartjs-plugin-datalabels": "^2.2.0",
 		"cron": "^1.8.2",
 		"cross-env": "^7.0.3",
 		"dayjs": "^1.11.1",
@@ -46,6 +49,7 @@
 		"pino": "^8.3.0"
 	},
 	"overrides": {
+		"chart.js": "3.9.1",
 		"p-throttle": "4.1.1"
 	},
 	"devDependencies": {
