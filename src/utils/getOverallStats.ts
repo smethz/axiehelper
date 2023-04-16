@@ -36,8 +36,9 @@ export async function getOverallStats(userId: UserID) {
 			(promise as PlayerLeaderboardData).rank != undefined && (promise as PlayerLeaderboardData).topRank != undefined
 	)
 
-	const battles = fulfilledPromises.find((promise: OverallStatsPromise): promise is ParsedPlayerBattles =>
-		Array.isArray((promise as ParsedPlayerBattles).battles)
+	const battles = fulfilledPromises.find(
+		(promise: OverallStatsPromise): promise is ParsedPlayerBattles =>
+			!!(promise as ParsedPlayerBattles)?.battles?.length
 	)
 
 	const inventory = fulfilledPromises.find((promise: OverallStatsPromise): promise is PlayerItem[] =>
