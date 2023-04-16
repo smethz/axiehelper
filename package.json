@@ -29,7 +29,7 @@
 		"axios": "^0.26.1",
 		"canvas": "^2.9.1",
 		"canvas-constructor": "^6.0.2",
-		"chart.js": "^3.9.1",
+		"chart.js": "3.9.1",
 		"chartjs-node-canvas": "^4.1.6",
 		"chartjs-plugin-datalabels": "^2.2.0",
 		"cron": "^1.8.2",
