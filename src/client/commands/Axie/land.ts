@@ -110,7 +110,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	function createLandEmbed(land: ParsedLand) {
 		const landEmbed = new EmbedBuilder()
-			.setTitle(translate("land_title", { landType: land.landType, column: land.col, row: land.col }))
+			.setTitle(translate("land_title", { landType: land.landType, column: land.col, row: land.row }))
 			.setURL(land.url)
 			.setThumbnail(land.thumbnail_url)
 			.addFields({
