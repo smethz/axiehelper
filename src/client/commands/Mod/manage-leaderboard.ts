@@ -412,10 +412,13 @@ async function handleAdd(
 
 	// List of Valid Player Profiles
 	let playersToAdd = fulfilledPromises.filter(isFulfilled).flatMap((v) => v.value) as unknown as PlayerProfileIngame[]
-	playersToAdd = playersToAdd.filter(
-		(obj, index, self) =>
-			index === self.findIndex((item) => item.userID === obj.userID && item.roninAddress === obj.roninAddress)
-	) // Making it unique cause of ronin and clientId couldnt be determined if its the same player
+	playersToAdd = playersToAdd
+		.filter((player) => player?.userID)
+		// Making it unique because of roninAddress and clientId could be the same player
+		.filter(
+			(obj, index, self) =>
+				index === self.findIndex((item) => item.userID === obj.userID && item.roninAddress === obj.roninAddress)
+		)
 
 	// List of Invalid IDs due to not having a profile
 	const invalidProfile_IDs = parsedUniqueValidIDs
@@ -482,7 +485,11 @@ async function getValidProfile(validID: string) {
 		validID = resolvedProfile.accountId
 	}
 
-	return getPlayerProfile(validID)
+	const originProfile = await getPlayerProfile(validID)
+
+	if (!originProfile || isAPIError(originProfile)) return
+
+	return originProfile
 }
 
 function parseUniqueIDs(ids: string[], guild: GuildWithLeaderboard) {
