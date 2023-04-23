@@ -1,14 +1,34 @@
 {
 	"name": "battles",
-	"description": "Get the battle stats of a user",
+	"description": "Get the battles of a player",
 	"options": {
-		"user": {
-			"name": "user",
-			"description": "Get the battles of the specified Discord User"
+		"arena": {
+			"name": "arena",
+			"description": "Shows player's arena battles",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "Shows the arena battles of the specified Discord User"
+				},
+				"address": {
+					"name": "id",
+					"description": "Shows the arena battles of the specified User ID or Ronin Address"
+				}
+			}
 		},
-		"address": {
-			"name": "id",
-			"description": "Get the battles of the specified User ID or Ronin Address"
+		"esport": {
+			"name": "esport",
+			"description": "Shows player's esport battles",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "Shows the esport battles of the specified Discord User"
+				},
+				"address": {
+					"name": "id",
+					"description": "Shows the esport battles of the specified User ID or Ronin Address"
+				}
+			}
 		}
 	},
 	"friendly_pvp": "Friendly PVP",
@@ -23,7 +43,7 @@
 	},
 	"watch_field": {
 		"name": "Watch Battle",
-		"value": "[📺 Watch](https://storage.googleapis.com/origin-production/origin.html?f=rpl&q={{battle_uuid}}&userId={{userId}})"
+		"value": "📺 Watch"
 	},
 	"results": {
 		"Victory": "Victory",

@@ -4,13 +4,16 @@ import logger from "pino-logger"
 
 const VALID_UUID_REGEX = /[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/i
 
-export async function getBattleReplay(battleId: string): Promise<string | void> {
+export async function getBattleReplay(
+	battleId: string,
+	environment: "prod" | "esport" = "prod"
+): Promise<string | void> {
 	const cacheKey = `battle_replay:${battleId}`
 	const cachedEntry = await cache.get(cacheKey)
 
 	if (cachedEntry) return cachedEntry
 
-	const url = `https://storage.googleapis.com/sm-prod-origin-battle-replay/pvp_battle_replay/${battleId}`
+	const url = `https://storage.googleapis.com/sm-${environment}-origin-battle-replay/pvp_battle_replay/${battleId}`
 
 	const battleReplay = await axios
 		.get<string>(url)

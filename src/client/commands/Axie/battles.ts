@@ -1,4 +1,5 @@
 import { getPlayerBattles } from "@apis/game-api/getPlayerBattles"
+import { getPlayerEsportBattles } from "@apis/game-api/getPlayerEsportBattles"
 import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
 import { getBattleReplay } from "@apis/getBattleReplay"
 import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
@@ -42,20 +43,47 @@ dayjs.extend(relativeTime)
 
 const config: RESTPostAPIChatInputApplicationCommandsJSONBody = {
 	name: "battles",
-	description: "Get the battle stats of a user",
+	description: "Get the battles of a player",
 	options: [
 		{
-			type: ApplicationCommandOptionType.User,
-			name: "user",
-			description: "Get the battles of the specified Discord User",
-			required: false,
+			type: ApplicationCommandOptionType.Subcommand,
+			name: "arena",
+			description: "Shows player's arena battles",
+			options: [
+				{
+					type: ApplicationCommandOptionType.User,
+					name: "user",
+					description: "Shows the arena battles of the specified Discord User",
+					required: false,
+				},
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "id",
+					description: "Shows the arena battles of the specified User ID or Ronin Address",
+					required: false,
+					autocomplete: true,
+				},
+			],
 		},
 		{
-			type: ApplicationCommandOptionType.String,
-			name: "id",
-			description: "Get the battles of the specified User ID or Ronin Address",
-			required: false,
-			autocomplete: true,
+			type: ApplicationCommandOptionType.Subcommand,
+			name: "esport",
+			description: "Shows player's esport battle stats",
+			options: [
+				{
+					type: ApplicationCommandOptionType.User,
+					name: "user",
+					description: "Shows the esport battles of the specified Discord User",
+					required: false,
+				},
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "id",
+					description: "Shows the esport battles of the specified User ID or Ronin Address",
+					required: false,
+					autocomplete: true,
+				},
+			],
 		},
 	],
 }
@@ -76,6 +104,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	let specifiedId = interaction.options.getString("id") ? interaction.options.getString("id")!.toLowerCase() : null
 	const specifiedUser = interaction.options.getMember("user") ?? interaction.user
+	const battleEnvironment = interaction.options.getSubcommand(true)
 
 	const failedBattlesEmbed = createErrorEmbed({
 		title: translate("errors.request_failed.title"),
@@ -108,7 +137,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			specifiedId = playerProfile.accountId
 		}
 
-		const playerBattles = await getPlayerBattles(specifiedId)
+		const playerBattles =
+			battleEnvironment === "arena" ? await getPlayerBattles(specifiedId) : await getPlayerEsportBattles(specifiedId)
 
 		if (isAPIError(playerBattles) || !playerBattles) {
 			await interaction
@@ -149,7 +179,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			const selectedMenu = createBattleSelection(playerBattles.battles, selectedBattle?.battleIndex)
 
-			const rpsWinner = await getBattleReplay(selectedBattle!.battle_uuid)
+			const rpsWinner = await getBattleReplay(
+				selectedBattle!.battle_uuid,
+				battleEnvironment === "arena" ? "prod" : "esport"
+			)
 			if (rpsWinner) selectedBattle!.rps_winner = rpsWinner
 
 			const battleEmbed = await createBattleEmbed(selectedBattle!)
@@ -191,7 +224,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	let playerBattles = await getPlayerBattles(user.savedProfiles[0]?.profileId!)
+	let playerBattles =
+		battleEnvironment === "arena"
+			? await getPlayerBattles(user.savedProfiles[0]?.profileId!)
+			: await getPlayerEsportBattles(user.savedProfiles[0]?.profileId!)
 
 	// No Battles - API Failed | No Battles
 	if (isAPIError(playerBattles) || !playerBattles) {
@@ -242,7 +278,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				selectedBattle?.battleIndex
 			)
 
-			const rpsWinner = await getBattleReplay(selectedBattle!.battle_uuid)
+			const rpsWinner = await getBattleReplay(
+				selectedBattle!.battle_uuid,
+				battleEnvironment === "arena" ? "prod" : "esport"
+			)
 			if (rpsWinner) selectedBattle!.rps_winner = rpsWinner
 
 			const battleEmbed = await createBattleEmbed(selectedBattle!)
@@ -276,7 +315,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				(profile) => profile.profileId === selectMenuInteraction.values[0]
 			)
 
-			playerBattles = await getPlayerBattles(selectMenuInteraction.values[0]!)
+			playerBattles =
+				battleEnvironment === "arena"
+					? await getPlayerBattles(selectMenuInteraction.values[0]!)
+					: await getPlayerEsportBattles(selectMenuInteraction.values[0]!)
 
 			// No Battles - API Failed | No Battles
 			if (isAPIError(playerBattles) || !playerBattles) {
@@ -398,6 +440,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			rewardsValue += `\n${battle.player.rewards?.moonshard_gained} ${emojis.moonshard}`
 		}
 
+		if (battle.battle_type_string === "pvp" || battle.battle_type_string === "practice_pvp") {
+			rewardsValue = "\u200b"
+		}
+
 		let battleInitiator = ""
 		if (battle.rps_winner) {
 			battleInitiator += `\n`
@@ -406,14 +452,15 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			})
 		}
 
+		let battleReplayUrl = `https://storage.googleapis.com/origin-production/`
+		battleReplayUrl += battleEnvironment === "origin" ? "origin.html" : "origin-esport.html"
+		battleReplayUrl += `?f=rpl&q=${battle.battle_uuid}&userId=${battle.player.userId}`
+
 		return new EmbedBuilder()
 			.setDescription(playerIdentifier + battleInitiator)
 			.addFields({
 				name: translate("watch_field.name"),
-				value: translate("watch_field.value", {
-					battle_uuid: battle.battle_uuid,
-					userId: battle.player.userId,
-				}),
+				value: `[${translate("watch_field.value")}](${battleReplayUrl})`,
 				inline: true,
 			})
 			.addFields({
@@ -474,11 +521,14 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			let rowLabel = `${battle.battleIndex + 1}.`
 			rowLabel += ` ${translate(`results.${battle.result}`)}`
-			rowLabel += ` | ${format_vstar_gained} V.Star`
 
-			if (battle.result === "Victory") {
-				rowLabel += ` | ${parsed_slp_gained} SLP`
-				rowLabel += ` | ${parsed_moonshard_gained} M.Shards`
+			if (battle.battle_type_string !== "practice_pvp" && battle.battle_type_string !== "pvp") {
+				rowLabel += ` | ${format_vstar_gained} V.Star`
+
+				if (battle.result === "Victory") {
+					rowLabel += ` | ${parsed_slp_gained} SLP`
+					rowLabel += ` | ${parsed_moonshard_gained} M.Shards`
+				}
 			}
 
 			const parsedBattleType = {
