@@ -1,6 +1,6 @@
 import emojis from "@constants/props/emojis.json"
 import { TranslateFunction } from "@custom-types/command"
-import { ItemRarity, PlayerItem, PlayerItems } from "@custom-types/items"
+import { ItemRarity, ItemWeight, PlayerItem, PlayerItems } from "@custom-types/items"
 import { getCharmsList, getRunesList } from "@utils/getItemList"
 import { APIEmbedField } from "discord.js"
 
@@ -57,18 +57,12 @@ export function getRuneCharmsOverviewField(
 ): APIEmbedField[] {
 	let fields = []
 
-	const ItemRarities = [ItemRarity.Common, ItemRarity.Rare, ItemRarity.Epic, ItemRarity.Mystic]
+	const ItemRarities = Object.values(ItemRarity)
 	const rarityRunes = ItemRarities.map((rarity) => filterItemByRarity(playerInventory, "rune", rarity))
 	const rarityCharms = ItemRarities.map((rarity) => filterItemByRarity(playerInventory, "charm", rarity))
 
 	if (rarityRunes.some((rarityRune) => rarityRune.length)) {
-		const runeList = ItemRarities.map((rarityType, index) => {
-			let fieldText = `${emojis.rarity[rarityType.toLowerCase() as keyof typeof emojis.rarity]} `
-			fieldText += ` **${rarityRunes[index]?.length}** `
-			fieldText += countMintable(rarityRunes[index]!) ? `(${countMintable(rarityRunes[index]!)}) ` : ``
-			fieldText += translate(`rarity.${rarityType.toLowerCase()}`, { ns: "common" })
-			return fieldText
-		}).join(" ")
+		const runeList = createItemFieldText(playerInventory, "rune", translate)
 
 		fields.push({
 			name: `${emojis.tokens.axie_rune} ${translate("runes", {
@@ -80,13 +74,7 @@ export function getRuneCharmsOverviewField(
 	}
 
 	if (rarityCharms.some((rarityCharm) => rarityCharm.length)) {
-		const charmsList = ItemRarities.map((rarityType, index) => {
-			let fieldText = `${emojis.rarity[rarityType.toLowerCase() as keyof typeof emojis.rarity]} `
-			fieldText += ` **${rarityCharms[index]?.length}** `
-			fieldText += countMintable(rarityCharms[index]!) ? `(${countMintable(rarityCharms[index]!)}) ` : ``
-			fieldText += translate(`rarity.${rarityType.toLowerCase()}`, { ns: "common" })
-			return fieldText
-		}).join(" ")
+		const charmsList = createItemFieldText(playerInventory, "charm", translate)
 
 		fields.push({
 			name: `${emojis.tokens.axie_charm} ${translate("charms", {
@@ -98,4 +86,49 @@ export function getRuneCharmsOverviewField(
 	}
 
 	return fields
+}
+
+export function createItemFieldText(
+	playerInventory: PlayerItems | undefined,
+	itemType: "charm" | "rune",
+	translate?: TranslateFunction
+) {
+	if (!playerInventory) return `No ${itemType} available`
+
+	const ItemRarities = Object.values(ItemRarity)
+	const rarityItems = ItemRarities.map((rarity) => filterItemByRarity(playerInventory, itemType, rarity))
+
+	const itemListText = ItemRarities.map((rarityType, index) => {
+		let fieldText = `${emojis.rarity[rarityType.toLowerCase() as keyof typeof emojis.rarity]} `
+		fieldText += ` **${rarityItems[index]?.length || 0}** `
+		fieldText += countMintable(rarityItems[index]!) ? `(${countMintable(rarityItems[index]!)}) ` : ``
+		if (translate) fieldText += translate(`rarity.${rarityType.toLowerCase()}`, { ns: "common" })
+		return fieldText
+	}).join(" ")
+
+	return itemListText
+}
+
+export function getInventoryWeight(playerInventory: PlayerItems | undefined) {
+	if (!playerInventory) {
+		return {
+			charms_weight: 0,
+			runes_weight: 0,
+		}
+	}
+
+	const charms_weight = filterItemType(playerInventory, "charm").reduce((sum, item) => {
+		const charmWeight = ItemWeight[item.charm!.item.rarity]
+		return sum + charmWeight
+	}, 0)
+
+	const runes_weight = filterItemType(playerInventory, "rune").reduce((sum, item) => {
+		const runeWeight = ItemWeight[item.rune!.item.rarity]
+		return sum + runeWeight
+	}, 0)
+
+	return {
+		charms_weight,
+		runes_weight,
+	}
 }

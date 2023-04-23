@@ -72,6 +72,13 @@ export enum ItemRarity {
 	Mystic = "Mystic",
 }
 
+export enum ItemWeight {
+	Common = 1,
+	Rare = 2,
+	Epic = 3,
+	Mystic = 4,
+}
+
 export enum ItemClass {
 	Aquatic = "Aquatic",
 	Beast = "Beast",

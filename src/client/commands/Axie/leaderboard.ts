@@ -13,9 +13,10 @@ import { numberFormatter } from "@utils/currencyFormatter"
 import { getGuildLeaderboard } from "@utils/dbFunctions"
 import { getOverallStats } from "@utils/getOverallStats"
 import { getPlayerExp } from "@utils/getPlayerExp"
+import { createItemFieldText, getInventoryWeight, parseInventory } from "@utils/parsers"
 import { isFulfilled } from "@utils/promiseHandler"
 import { sortList } from "@utils/sortList"
-import { APIMessageComponentEmoji, ComponentType, EmbedBuilder, parseEmoji, PermissionsBitField } from "discord.js"
+import { APIMessageComponentEmoji, ComponentType, EmbedBuilder, PermissionsBitField, parseEmoji } from "discord.js"
 
 interface ParsedPlayerStats {
 	userId: string
@@ -37,6 +38,9 @@ interface ParsedPlayerStats {
 	slp: number | undefined
 	mintable_slp: number | undefined
 	moonshards: number | undefined
+	charmsWeight?: number | undefined
+	runesWeight?: number | undefined
+	inventory: PlayerItem[] | undefined
 }
 
 const command: SlashCommand = {
@@ -103,7 +107,16 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				label: translate("labels.crafting_level"),
 				emoji: parseEmoji(emojis.exp) as APIMessageComponentEmoji,
 			},
-
+			{
+				value: "runes",
+				label: translate("runes", { ns: "common" }),
+				emoji: parseEmoji(emojis.tokens.axie_rune) as APIMessageComponentEmoji,
+			},
+			{
+				value: "charms",
+				label: translate("charms", { ns: "common" }),
+				emoji: parseEmoji(emojis.tokens.axie_charm) as APIMessageComponentEmoji,
+			},
 			{
 				value: "slp",
 				label: "SLP",
@@ -181,7 +194,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 			sortedPlayers = sortLeaderboard(players, sortType)
 			pageIndex = 0
-			pages = createPages(sortedPlayers)
+			const itemsPerPage = sortType === "charms" || sortType === "runes" ? 10 : 20
+			pages = createPages(sortedPlayers, itemsPerPage)
 			paginationButtons = createPaginationButtons({ pageIndex, maxPage: pages.length })
 
 			rankingsEmbed.setDescription(pages[pageIndex] as string)
@@ -271,6 +285,20 @@ function sortLeaderboard(players: ParsedPlayerStats[], sortType: string = "vstar
 				return `${player.rankIcon} ${index + 1}. **${numberFormatter(player.vstars) ?? "???"}** ${emojis.victory_star}`
 			},
 		},
+		charms: {
+			key: "charmsWeight",
+			direction: "descending",
+			text: (player: ParsedPlayerStats, index: number) => {
+				return `${index + 1}. ${createItemFieldText(player.inventory, "charm")}`
+			},
+		},
+		runes: {
+			key: "runesWeight",
+			direction: "descending",
+			text: (player: ParsedPlayerStats, index: number) => {
+				return `${index + 1}. ${createItemFieldText(player.inventory, "rune")}`
+			},
+		},
 	}
 
 	const sortedList = sortList(
@@ -302,6 +330,16 @@ function parseLeaderboardPlayerStats(player: {
 	const { level, crafting_exp, table_exp } = getPlayerExp(player.inventory)
 	const xp_stats = `${numberFormatter(crafting_exp)} / ${numberFormatter(table_exp)} XP`
 
+	const parsedInventory = player.inventory
+		? parseInventory(player.inventory).filter((item) => {
+				if (item.charm) return item.charm.season?.id === globalThis.CURRENT_SEASON_ID
+				if (item.rune) return item.rune.season?.id === globalThis.CURRENT_SEASON_ID
+				return
+		  })
+		: undefined
+
+	const inventoryWeight = getInventoryWeight(parsedInventory)
+
 	return {
 		userId: player.userId,
 		name: player.profile?.name,
@@ -322,5 +360,8 @@ function parseLeaderboardPlayerStats(player: {
 		slp: slp?.quantity,
 		mintable_slp: slp?.withdrawable,
 		moonshards: moonshards?.quantity,
+		charmsWeight: inventoryWeight.charms_weight,
+		runesWeight: inventoryWeight.runes_weight,
+		inventory: parsedInventory,
 	}
 }
