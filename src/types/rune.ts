@@ -1,4 +1,4 @@
-import type { ItemMinimumPrice } from "@custom-types/items"
+import type { ItemMinimumPrice, ItemRarity } from "@custom-types/items"
 import { Metadata } from "./common"
 
 export interface Runes {
@@ -36,7 +36,7 @@ export interface RuneInfo {
 	id: string
 	displayOrder: number
 	category: string
-	rarity: string
+	rarity: ItemRarity
 	description: string
 	name: string
 	tokenStandard: string
