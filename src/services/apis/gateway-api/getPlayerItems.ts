@@ -42,9 +42,10 @@ export async function getPlayerItems({
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
 	const throttledRequest = throttle(async () => {
-		const initialPlayerItems = await GatewayAPI.get<APIPlayerItemsResponse>("/origin/v2/community/users/items", {
-			params: { userID, limit, offset, itemIDs },
-		})
+		const initialPlayerItems = await GatewayAPI.get<APIPlayerItemsResponse>(
+			`/origins/v2/community/users/${userID}/items`,
+			{ params: { limit, offset, itemIDs } }
+		)
 			.then(async (response) => response.data)
 			.catch((error: AxiosError) => {
 				logger.error(`GatewayAPI Error: ${error.response?.status} getPlayerItems - ${userID}`)
