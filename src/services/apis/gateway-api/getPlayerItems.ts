@@ -41,11 +41,12 @@ export async function getPlayerItems({
 	const cachedEntry = await cache.get(cacheKey)
 	if (cachedEntry) return JSON.parse(cachedEntry)
 
+	const endpoint = `/origins/v2/community/users/${userID}/items`
+
 	const throttledRequest = throttle(async () => {
-		const initialPlayerItems = await GatewayAPI.get<APIPlayerItemsResponse>(
-			`/origins/v2/community/users/${userID}/items`,
-			{ params: { limit, offset, itemIDs } }
-		)
+		const initialPlayerItems = await GatewayAPI.get<APIPlayerItemsResponse>(endpoint, {
+			params: { limit, offset, itemIDs },
+		})
 			.then(async (response) => response.data)
 			.catch((error: AxiosError) => {
 				logger.error(`GatewayAPI Error: ${error.response?.status} getPlayerItems - ${userID}`)
@@ -65,8 +66,8 @@ export async function getPlayerItems({
 
 			for (let currentPage = 1; currentPage < totalPages; currentPage++) {
 				promisesArray.push(
-					GatewayAPI.get<APIPlayerItemsResponse>(`origin/v2/community/users/items`, {
-						params: { userID, limit, offset: 1 + limit * currentPage },
+					GatewayAPI.get<APIPlayerItemsResponse>(endpoint, {
+						params: { limit, offset: 1 + limit * currentPage },
 					})
 				)
 			}
