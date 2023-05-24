@@ -1,6 +1,7 @@
 import { getContest } from "@apis/contest-api/getContest"
 import { getContestLeaderboard } from "@apis/contest-api/getContestLeaderboard"
 import { getLeaderboard } from "@apis/game-api/getLeaderboard"
+import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
 import { getSeasons } from "@apis/game-api/getSeasons"
 import { createErrorEmbed } from "@client/components/embeds"
 import {
@@ -14,12 +15,15 @@ import { DEFAULT_IDLE_TIME } from "@constants/index"
 import emojis from "@constants/props/emojis.json"
 import { AXIES_IO_URL } from "@constants/url"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
+import { UserID } from "@custom-types/common"
 import { ContestPlayer } from "@custom-types/contest"
-import { PlayerLeaderboardData } from "@custom-types/profile"
+import { ParsedPlayerIngameProfile, PlayerLeaderboardData } from "@custom-types/profile"
 import { componentFilter } from "@utils/componentFilter"
 import { disableComponents } from "@utils/componentsToggler"
 import { numberFormatter } from "@utils/currencyFormatter"
 import { isAPIError } from "@utils/isAPIError"
+import { isFulfilled } from "@utils/promiseHandler"
+import { AxiosError } from "axios"
 import { ApplicationCommandOptionType, ComponentType, EmbedBuilder, PermissionsBitField } from "discord.js"
 
 const command: SlashCommand = {
@@ -106,7 +110,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			})
 		}
 
-		let parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
+		let parsedLeaderboard = await parseArenaPage(arenaLeaderboard._items)
 
 		const maxPage = Math.floor(arenaLeaderboard._metadata.total / numOfPlayersPerPage) || 1
 		let pageIndex = leaderboardPage - 1
@@ -144,7 +148,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 				return
 			}
 
-			parsedLeaderboard = parseArenaPage(arenaLeaderboard._items)
+			parsedLeaderboard = await parseArenaPage(arenaLeaderboard._items)
 			pages = createPages(parsedLeaderboard)
 			paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
 
@@ -185,7 +189,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	let parsedLeaderboard = parseContestPage(contestLeaderboard.players)
+	let parsedLeaderboard = await parseContestPage(contestLeaderboard.players)
 
 	const isContestEnded = latestContest!.end_time < Date.now() / 1000
 
@@ -236,7 +240,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 			return
 		}
 
-		parsedLeaderboard = parseContestPage(contestLeaderboard.players)
+		parsedLeaderboard = await parseContestPage(contestLeaderboard.players)
 		pages = createPages(parsedLeaderboard)
 		paginationButtons = createPaginationButtons({ pageIndex, maxPage, isDynamic: true })
 
@@ -259,24 +263,49 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	})
 }
 
-function parseArenaPage(players: PlayerLeaderboardData[]) {
+async function parseArenaPage(players: PlayerLeaderboardData[]) {
+	const playerProfiles = await getPlayerProfiles(players.map((player) => player.userID))
+
 	return players
 		.map((player) => {
+			const playerProfile = playerProfiles.find(
+				(profile) => (profile as ParsedPlayerIngameProfile).userID === player.userID
+			) as void | AxiosError | ParsedPlayerIngameProfile
+
+			const playerRoninAddress =
+				playerProfile && !isAPIError(playerProfile) ? playerProfile.roninAddress : player.userID
+
 			return `${player.rankIcon} ${numberFormatter(player.topRank)}. **${numberFormatter(player.vstar)}** ${
 				emojis.victory_star
-			} — [${player.name}](${AXIES_IO_URL}/profile/${player.userID})`
+			} — [${player.name}](${AXIES_IO_URL}/profile/${playerRoninAddress})`
 		})
 		.join("\n")
 }
 
-function parseContestPage(players: ContestPlayer[]) {
+async function parseContestPage(players: ContestPlayer[]) {
+	const playerProfiles = await getPlayerProfiles(players.map((player) => player.user_id))
+
 	return players
 		.map((player) => {
+			const playerProfile = playerProfiles.find(
+				(profile) => (profile as ParsedPlayerIngameProfile).userID === player.user_id
+			) as void | AxiosError | ParsedPlayerIngameProfile
+
+			const playerRoninAddress =
+				playerProfile && !isAPIError(playerProfile) ? playerProfile.roninAddress : player.user_id
+
 			return `${player.rank}. **${numberFormatter(player.total_point)}** pts — [${
 				player.user_name
-			}](https://axies.io/profile/${player.user_id})`
+			}](https://axies.io/profile/${playerRoninAddress})`
 		})
 		.join("\n")
+}
+
+async function getPlayerProfiles(userIdArray: UserID[]) {
+	const promises = userIdArray.map((userId) => getPlayerProfile(userId))
+	return (await Promise.allSettled(promises))
+		.filter((promise): promise is PromiseFulfilledResult<any> => isFulfilled(promise))
+		.map((promise) => promise.value)
 }
 
 export default command
