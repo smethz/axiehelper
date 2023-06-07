@@ -203,7 +203,7 @@ function createAssetsEmbed(
 
 	return new EmbedBuilder()
 		.setDescription(
-			`[${emojis.tokens.ron} ${userProfile!.name || roninAddress}](${RONINCHAIN_URL}/address/${parseAddress(
+			`${emojis.tokens.ron} [${userProfile!.name || roninAddress}](${RONINCHAIN_URL}/address/${parseAddress(
 				roninAddress,
 				"ronin"
 			)})`

@@ -467,7 +467,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	): EmbedBuilder {
 		const inventoryOverviewEmbed = new EmbedBuilder()
 			.setDescription(
-				`[${emojis.axies_io} ${translate("title", { playerName: playerProfile.name })}](${playerProfile.url.axies_io})`
+				`${emojis.axies_io} [${translate("title", { playerName: playerProfile.name })}](${playerProfile.url.axies_io})`
 			)
 			.addFields(getRuneCharmsOverviewField(playerInventory, translate))
 			.setColor("Random")

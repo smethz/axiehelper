@@ -373,7 +373,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	function createBattleStatsEmbed(battles: ParsedPlayerBattles): EmbedBuilder {
 		const playerName = battles.player
-			? `[${emojis.axies_io} ${battles.player.name}](${AXIES_IO_URL}/profile/${parseAddress(
+			? `${emojis.axies_io} [${battles.player.name}](${AXIES_IO_URL}/profile/${parseAddress(
 					battles.player.roninAddress,
 					"ronin"
 			  )}/battles)`
@@ -422,8 +422,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		}
 
 		const playerIdentifier = battle.player.profile
-			? `[${emojis.axies_io} ${battle.player.profile.name}](${battle.player.profile.url.axies_io})`
-			: `[${emojis.axies_io} Player's Recent Battle}](${AXIES_IO_URL}/profile/${parseAddress(battle.player.userId)})`
+			? `${emojis.axies_io} [${battle.player.profile.name}](${battle.player.profile.url.axies_io})`
+			: `${emojis.axies_io} [Player's Recent Battle}](${AXIES_IO_URL}/profile/${parseAddress(battle.player.userId)})`
 
 		const opponentIdentifier = battle.opponent.profile
 			? `[${battle.opponent.profile.name}](${MARKETPLACE_URL}/profile/${parseAddress(

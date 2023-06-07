@@ -158,7 +158,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	async function createCharmEmbed(charm: ParsedCharm) {
 		const charmEmbed = new EmbedBuilder()
-			.setDescription(`[${charm.classEmoji} ${charm.item.name}](${charm.listingUrl})`)
+			.setDescription(`${charm.classEmoji} [${charm.item.name}](${charm.listingUrl})`)
 			.addFields(
 				{
 					name: translate("fields.effect"),

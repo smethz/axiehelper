@@ -72,7 +72,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	const axieEmbed = new EmbedBuilder()
 		.setDescription(
-			`[${classProps[axie.class.toLowerCase() as keyof typeof classProps].emoji} ${axie.name} - ${axie.id}](${
+			`${classProps[axie.class.toLowerCase() as keyof typeof classProps].emoji} [${axie.name} - ${axie.id}](${
 				axie.url
 			})`
 		)

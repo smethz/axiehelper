@@ -58,7 +58,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	if (!axie.class) {
 		axieEmbed.setDescription(`[${axie.id} - #${axie.name}](${axie.url})`)
 	} else {
-		axieEmbed.setDescription(`[${axieClassProps[axie.class].emoji} #${axie.id} - ${axie.name}](${axie.url})`)
+		axieEmbed.setDescription(`${axieClassProps[axie.class].emoji} [#${axie.id} - ${axie.name}](${axie.url})`)
 
 		axieEmbed.setColor(axieClassProps[axie.class].color as ColorResolvable)
 	}

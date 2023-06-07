@@ -230,9 +230,9 @@ function createStatsEmbed(
 ) {
 	const parsedRoninAddress = parseAddress(playerProfile.roninAddress, "ronin")
 
-	const playerName = `[${emojis.axies_io} ${playerProfile.name}](${playerProfile.url.axies_io})`
-	const marketplaceURL = `[${emojis.marketplace} ${parsedRoninAddress}](${playerProfile.url.marketplace})`
-	const explorerURL = `[${emojis.ronin} Explorer](${playerProfile.url.explorer})`
+	const playerName = `${emojis.axies_io} [${playerProfile.name}](${playerProfile.url.axies_io})`
+	const marketplaceURL = `${emojis.marketplace} [${parsedRoninAddress}](${playerProfile.url.marketplace})`
+	const explorerURL = `${emojis.ronin} [Explorer](${playerProfile.url.explorer})`
 
 	let battleFields: APIEmbedField[] = []
 	let lastPlayedTime = ``

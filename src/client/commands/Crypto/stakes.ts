@@ -352,8 +352,8 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	function createStakedTokenEmbed(stakedToken: StakedToken | StakedTokenPair, roninAddress: RoninAddress) {
 		const embedDescription =
-			`[${stakedToken.title}](${stakedToken.url})\n` +
-			`[${emoji.tokens.ron} ${roninAddress}](${RONINCHAIN_URL}/address/${roninAddress})`
+			`${stakedToken.title}(${stakedToken.url})\n` +
+			`${emoji.tokens.ron} [${roninAddress}](${RONINCHAIN_URL}/address/${roninAddress})`
 
 		const last_claim = stakedToken.last_claim_timestamp !== 0 ? `<t:${stakedToken.last_claim_timestamp}:f>` : `---`
 		const next_claim = stakedToken.next_claim_timestamp !== 86400 ? `<t:${stakedToken.next_claim_timestamp}:f>` : `---`
