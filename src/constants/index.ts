@@ -1,4 +1,4 @@
-export const DEFAULT_CACHE_EXPIRATION = 60 * 30 // 30 minutes in seconds
+export const DEFAULT_CACHE_EXPIRATION = 60 * 10 // 10 minutes in seconds
 export const DEFAULT_IDLE_TIME = 1000 * 60 * 10 // 10 minutes in milliseconds
 
 export const isDevelopment = process.env.NODE_ENV === "development"
