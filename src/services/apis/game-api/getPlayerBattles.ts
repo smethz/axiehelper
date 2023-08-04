@@ -15,13 +15,13 @@ interface APIBattlesResponse {
 
 interface APIBattlesParams {
 	limit?: number
-	offset?: number
+	page?: number
 	type?: "pve" | "pvp"
 }
 
 export async function getPlayerBattles(
 	userId: UserID,
-	options: APIBattlesParams = { limit: 100, offset: 0, type: "pvp" }
+	options: APIBattlesParams = { limit: 100, page: 1, type: "pvp" }
 ): Promise<ParsedPlayerBattles | AxiosError | void> {
 	const cacheKey = `playerBattles:${userId}`
 	const cacheEntry = await cache.get(cacheKey)
@@ -32,7 +32,7 @@ export async function getPlayerBattles(
 		baseURL: BATTLES_API,
 		params: {
 			limit: options.limit,
-			offset: options.offset,
+			page: options.page,
 			type: options.type,
 			client_id: userId,
 		},
