@@ -35,15 +35,15 @@ async function execute({ interaction }: CommandExecuteParams): Promise<void> {
 	try {
 		switch (action) {
 			case "cards": {
-				await updateCardsList()
+				await updateCardsList({ force: true })
 				break
 			}
 			case "charms": {
-				await updateCharmsList()
+				await updateCharmsList({ force: true })
 				break
 			}
 			case "runes": {
-				await updateRunesList()
+				await updateRunesList({ force: true })
 				break
 			}
 			case "body-parts": {
@@ -55,7 +55,13 @@ async function execute({ interaction }: CommandExecuteParams): Promise<void> {
 				break
 			}
 			default: {
-				await Promise.all([updateBodyParts(), updateCardsList(), updateCharmsList(), updateRunesList(), updateSeason()])
+				await Promise.all([
+					updateBodyParts(),
+					updateCardsList({ force: true }),
+					updateCharmsList({ force: true }),
+					updateRunesList({ force: true }),
+					updateSeason(),
+				])
 				break
 			}
 		}
