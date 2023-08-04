@@ -1,4 +1,6 @@
 import { AXIEINFINITY_CDN_URL } from "@constants/url"
+import { Part } from "@custom-types/parts"
+import { getCardsList } from "@utils/getItemList"
 import axios from "axios"
 import { writeJSONSync } from "fs-extra"
 import path from "path"
@@ -14,9 +16,23 @@ export function updateBodyParts() {
 
 			if (!bodyParts) throw new Error("RegExp Failed")
 
-			const parsedBodyParts = bodyParts[0].replaceAll("\\", "")
+			let parsedBodyParts: Part[] = Object.values(JSON.parse(bodyParts[0].replaceAll("\\", "")))
 
-			writeJSONSync(path.join(__dirname, `../../constants/props/body-parts.json`), JSON.parse(parsedBodyParts))
+			const cardsList = getCardsList()
+
+			parsedBodyParts = parsedBodyParts.map((part) => {
+				const originCard = cardsList.find((card) => {
+					const cardId = `${card.partClass}-${card.partType}-${card.partValue
+						.toString()
+						.padStart(2, "0")}`.toLowerCase()
+					return part.ability_id === cardId
+				})
+
+				part.originCard = originCard!
+				return part
+			})
+
+			writeJSONSync(path.join(__dirname, `../../constants/props/body-parts.json`), parsedBodyParts)
 		})
 		.catch((error) => logger.error(error, "Failed to update Body Parts"))
 }

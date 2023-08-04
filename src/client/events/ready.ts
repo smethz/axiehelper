@@ -11,13 +11,9 @@ export default async function (client: Client) {
 		type: ActivityType.Watching,
 	})
 
-	await Promise.allSettled([
-		updateBodyParts(),
-		updateCardsList(),
-		updateCharmsList(),
-		updateRunesList(),
-		updateSeason(),
-	])
+	await updateCardsList()
+
+	await Promise.allSettled([updateBodyParts(), updateCharmsList(), updateRunesList(), updateSeason()])
 
 	await updateMinPriceJob.fireOnTick()
 
