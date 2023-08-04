@@ -1,15 +1,19 @@
-import { SPECIAL_CHAR_REGEX } from "@constants/index"
 import { AXIEINFINITY_CDN_URL } from "@constants/url"
 import { Card } from "@custom-types/card"
-import { OriginCard } from "@custom-types/parts"
 import { Canvas, loadImage } from "canvas-constructor/cairo"
 
 const cardCanvas = new Canvas(456, 706)
 
-export async function createCardCanvas(card: OriginCard | Card) {
+const highlightedWordRegex = /(\{.*?\}|\[.*?\]|<.*?>)/g
+const hightlightCharRegex = /<|>|\{|\}|\[|\]/g
+
+// TODO Fix regex doesn't work for: <word0 word1>. word2 word3 =>
+const spaceSplitRegex = /\s+(?![^<>[\]{}]*[>\]\}])/
+
+export async function createCardCanvas(card: Card) {
 	const cardId = `${card.partClass}-${card.partType}-${card.partValue.toString().padStart(2, "0")}`.toLowerCase()
 	const cardBaseImage = await loadImage(
-		`${AXIEINFINITY_CDN_URL}/game/origin-cards/base/origin-cards-20230308/${cardId}-00.png`
+		`${AXIEINFINITY_CDN_URL}/game/origin-cards/base/origin-cards-20230726/${cardId}-00.png`
 	)
 
 	// Card Base Image
@@ -22,15 +26,70 @@ export async function createCardCanvas(card: OriginCard | Card) {
 	cardCanvas.printText(card.name, 175, 440, 250)
 
 	// Card Text Description
-	card.description = card.description.replace(SPECIAL_CHAR_REGEX, "")
+	cardCanvas.setTextFont('bold 18px "Work Sans"')
 
-	cardCanvas.setTextFont('20px "Work Sans"')
-	cardCanvas.setTextAlign("center")
-	cardCanvas.printWrappedText(card.description, 245, 550, 350)
+	const wrappedDescription = wrapText(cardCanvas, card.description, 350)
+
+	const descriptionY = 530
+
+	for (const [lineIndex, line] of wrappedDescription.entries()) {
+		const specialDescription = splitDescription(line)
+		let currentLine = ""
+
+		const parsedLine = line.replace(hightlightCharRegex, "")
+		const lineWidth = cardCanvas.measureText(parsedLine).width
+
+		const centerX = (cardCanvas.width - lineWidth) / 2
+		let descriptionX = centerX + 20
+
+		for (let word of specialDescription) {
+			if (highlightedWordRegex.test(word)) {
+				// highlight description
+				word = word.replace(hightlightCharRegex, "")
+				cardCanvas.setColor("#ffc75c")
+			} else {
+				cardCanvas.setColor("#FFFFFF")
+			}
+
+			const testLine = currentLine.length === 0 ? word : `${currentLine} ${word}`
+			currentLine = testLine
+
+			cardCanvas.printText(word, descriptionX, descriptionY + 22 * lineIndex)
+			descriptionX += cardCanvas.measureText(word).width
+		}
+	}
 
 	const cardImage = cardCanvas.toBuffer("image/png")
 
 	cardCanvas.clearRectangle()
 
 	return cardImage
+}
+
+function splitDescription(description: string) {
+	return description.split(highlightedWordRegex).filter(Boolean)
+}
+
+function wrapText(canvas: Canvas, text: string, maxWidth: number) {
+	const words = text.split(spaceSplitRegex)
+	const lines = []
+	let currentLine = ""
+
+	for (const word of words) {
+		const testLine = currentLine.length === 0 ? word : `${currentLine} ${word}`
+		const testWidth = canvas.measureText(testLine).width
+
+		if (testWidth > maxWidth) {
+			lines.push(currentLine.trim())
+			currentLine = word
+		} else {
+			currentLine = testLine
+		}
+	}
+
+	if (currentLine.length > 0) {
+		lines.push(currentLine)
+	}
+
+	return lines
 }
