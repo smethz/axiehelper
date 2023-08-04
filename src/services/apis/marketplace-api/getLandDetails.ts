@@ -1,4 +1,4 @@
-import { GetLandDetailQuery } from "@constants/queries/GetLandDetailQuery"
+import { GetLandDetailQuery } from "@constants/queries"
 import { Land, ParsedLand } from "@custom-types/land"
 import { MarketplaceAPI } from "@services//api"
 import { cache } from "@services/cache"
@@ -23,7 +23,7 @@ export async function getLandDetails(col: number, row: number): Promise<ParsedLa
 
 	if (cacheEntry) return { ...JSON.parse(cacheEntry), fromCache: true }
 
-	let landDetails = await MarketplaceAPI.post<APILandDetailsResponse>("/", {
+	let landDetails = await MarketplaceAPI.post<APILandDetailsResponse>("", {
 		query: GetLandDetailQuery,
 		variables: {
 			col,

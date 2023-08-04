@@ -1,5 +1,4 @@
 import { getAssets, ParsedTokenBalances } from "@apis/chain/getAssets"
-import { APIResolvedProfileResponse, resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import autocomplete from "@client/components/autocomplete"
 import { createErrorEmbed, sendInvalidRoninAddressError, sendNoSavedProfilesError } from "@client/components/embeds"
 import { createProfileSelectMenu } from "@client/components/selection"
@@ -13,6 +12,7 @@ import { disableComponents } from "@utils/componentsToggler"
 import { getUser } from "@utils/dbFunctions"
 import { isAPIError } from "@utils/isAPIError"
 import { parseAddress } from "@utils/parsers"
+import { resolveProfile } from "@utils/resolveProfile"
 import { isValidRoninAddress } from "@utils/validateAddress"
 import {
 	ApplicationCommandOptionType,
@@ -95,7 +95,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		if (isAPIError(userProfile)) userProfile = undefined
 
-		const assetsEmbed = createAssetsEmbed(userAssets, userProfile, specifiedAddress)
+		const assetsEmbed = createAssetsEmbed(userAssets, specifiedAddress)
 
 		await interaction.editReply({ embeds: [assetsEmbed] }).catch(() => {})
 		return
@@ -130,7 +130,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 	if (isAPIError(userProfile)) userProfile = undefined
 
-	const assetsEmbed = createAssetsEmbed(userAssets, userProfile, dbUser.savedProfiles[0]?.profileId!)
+	const assetsEmbed = createAssetsEmbed(userAssets, dbUser.savedProfiles[0]?.profileId!)
 
 	if (dbUser.savedProfiles.length === 1) {
 		await interaction.editReply({ embeds: [assetsEmbed] }).catch(() => {})
@@ -177,7 +177,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 
 		if (isAPIError(userProfile)) userProfile = undefined
 
-		const assetsEmbed = createAssetsEmbed(userAssets, userProfile, selectedProfile.profile.roninAddress)
+		const assetsEmbed = createAssetsEmbed(userAssets, selectedProfile.profile.roninAddress)
 
 		await interaction.editReply({ embeds: [assetsEmbed], components: [profileSelector] }).catch(() => {})
 	})
@@ -188,11 +188,7 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 	})
 }
 
-function createAssetsEmbed(
-	userAssets: ParsedTokenBalances,
-	userProfile: APIResolvedProfileResponse | void,
-	roninAddress: RoninAddress
-): EmbedBuilder {
+function createAssetsEmbed(userAssets: ParsedTokenBalances, roninAddress: RoninAddress): EmbedBuilder {
 	const embedFiels = userAssets.results.map((token) => {
 		return {
 			name: `${token.emoji} ${token.token_name}`,
@@ -203,10 +199,7 @@ function createAssetsEmbed(
 
 	return new EmbedBuilder()
 		.setDescription(
-			`${emojis.tokens.ron} [${userProfile!.name || roninAddress}](${RONINCHAIN_URL}/address/${parseAddress(
-				roninAddress,
-				"ronin"
-			)})`
+			`${emojis.tokens.ron} [${roninAddress}](${RONINCHAIN_URL}/address/${parseAddress(roninAddress, "ronin")})`
 		)
 		.addFields(embedFiels)
 		.setColor("Random")

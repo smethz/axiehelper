@@ -1,4 +1,4 @@
-import { GetAxieDetailQuery } from "@constants/queries/GetAxieDetailQuery"
+import { GetAxieDetailQuery } from "@constants/queries"
 import { MARKETPLACE_URL } from "@constants/url"
 import { Axie, AxieClass } from "@custom-types/axie"
 import { MarketplaceAPI } from "@services//api"
@@ -21,7 +21,7 @@ export async function getAxieDetails(axieId: number): Promise<Axie | AxiosError 
 
 	if (cacheEntry) return { ...JSON.parse(cacheEntry), fromCache: true }
 
-	const axieDetails = await MarketplaceAPI.post<APIAxieDetailsResponse>("/", {
+	const axieDetails = await MarketplaceAPI.post<APIAxieDetailsResponse>("", {
 		query: GetAxieDetailQuery,
 		variables: {
 			axieId,

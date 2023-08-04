@@ -1,5 +1,4 @@
 import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
-import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import autocomplete from "@client/components/autocomplete"
 import {
 	createErrorEmbed,
@@ -22,6 +21,7 @@ import { FilterCriteria, deepFilter } from "@utils/deepFilter"
 import { getPlayerCharmsAndRunes } from "@utils/getPlayerItems"
 import { isAPIError } from "@utils/isAPIError"
 import { getRuneCharmsOverviewField } from "@utils/parsers"
+import { resolveProfile } from "@utils/resolveProfile"
 import { determineAddress, isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import {
 	APIMessageComponentEmoji,

@@ -1,9 +1,9 @@
-import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import { createErrorEmbed } from "@client/components/embeds"
 import { AXIES_IO_URL } from "@constants/url"
 import { CommandExecuteParams, SlashCommand } from "@custom-types/command"
 import { isAPIError } from "@utils/isAPIError"
 import { parseAddress } from "@utils/parsers"
+import { resolveProfile } from "@utils/resolveProfile"
 import { determineAddress } from "@utils/validateAddress"
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionsBitField } from "discord.js"
 
@@ -57,10 +57,10 @@ async function execute({ interaction, translate }: CommandExecuteParams): Promis
 		return
 	}
 
-	const parsedAddress = parseAddress(profile.ronin, "ronin")
+	const parsedAddress = parseAddress(profile.roninAddress, "ronin")
 
 	const profileEmbed = new EmbedBuilder()
-		.setTitle(translate("profile_title", { name: profile.name }))
+		.setTitle(translate("profile_title"))
 		.setURL(`${AXIES_IO_URL}/profile/${parsedAddress}`)
 		.addFields([
 			{

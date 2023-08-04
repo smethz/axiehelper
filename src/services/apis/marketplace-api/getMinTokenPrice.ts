@@ -1,4 +1,4 @@
-import { GetMinPriceQuery } from "@constants/queries/GetMinPriceQuery"
+import { GetMinPriceQuery } from "@constants/queries"
 import { MARKETPLACE_GRAPHQL_API } from "@constants/url"
 import { ItemMinimumPrice, TokenType } from "@custom-types/items"
 import { cache } from "@services//cache"

@@ -1,4 +1,3 @@
-import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import autocomplete from "@client/components/autocomplete"
 import {
 	createErrorEmbed,
@@ -23,6 +22,7 @@ import { getOverallStats } from "@utils/getOverallStats"
 import { getPlayerExp } from "@utils/getPlayerExp"
 import { isAPIError } from "@utils/isAPIError"
 import { getRuneCharmsOverviewField, parseAddress, parseInventory } from "@utils/parsers"
+import { resolveProfile } from "@utils/resolveProfile"
 import { determineAddress, isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import {
 	APIEmbedField,

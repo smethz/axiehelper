@@ -1,5 +1,4 @@
 import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
-import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import { createErrorEmbed, createSuccessEmbed } from "@client/components/embeds"
 import { MAX_SAVED_PROFILES } from "@constants/index"
 import { CommandExecuteParams, InteractionModalParams, SlashCommand } from "@custom-types/command"
@@ -7,6 +6,7 @@ import { Prisma } from "@prisma/client"
 import { db } from "@services/db"
 import { createUser, getUser } from "@utils/dbFunctions"
 import { isAPIError } from "@utils/isAPIError"
+import { resolveProfile } from "@utils/resolveProfile"
 import { isValidClientID, isValidRoninAddress } from "@utils/validateAddress"
 import {
 	ActionRowBuilder,

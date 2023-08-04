@@ -1,4 +1,6 @@
 export interface Axie {
+	axpInfo: AxpInfo
+	axpStatDay: AxpStatDay
 	battleInfo: BattleInfo
 	birthDate: number
 	bodyShape: string | null
@@ -10,11 +12,11 @@ export interface Axie {
 	genes: string
 	id: string
 	image: string
-	level: number
 	matronClass: string
 	matronId: number
 	name: string
 	newGenes: string
+	offers: Offers
 	order?: Order
 	owner: string
 	ownerProfile?: OwnerProfile
@@ -24,6 +26,9 @@ export interface Axie {
 	sireId: number
 	stage: number
 	stats: Stats
+	highestOffer: null
+	numActiveOffers: number
+	equipmentInstances: any[]
 	title: string | null
 	url: string
 }
@@ -38,6 +43,22 @@ export enum AxieClass {
 	Mech = "mech",
 	Plant = "plant",
 	Reptile = "reptile",
+}
+
+export interface AxpInfo {
+	level: number
+	nextOnchainLevel: number
+	onchainLevel: number
+	shouldAscend: boolean
+	xp: number
+	xpToLevelUp: number
+}
+
+export interface AxpStatDay {
+	axieId: number
+	axpAxieCapDay: number
+	totalGainedAxpDay: number
+	maxLevel: number
 }
 
 export interface BattleInfo {
@@ -59,6 +80,11 @@ export interface Figure {
 	atlas: string
 	image: string
 	model: string
+}
+
+export interface Offers {
+	total: number
+	data: any[]
 }
 
 export interface Order {
@@ -93,7 +119,9 @@ export interface Asset {
 }
 
 export interface OwnerProfile {
+	accountId: string
 	name: string
+	settings: null
 }
 
 export interface Part {
@@ -127,7 +155,6 @@ export interface PotentialPoints {
 	mech: number
 	plant: number
 	reptile: number
-	__typename?: "PotentialPoints"
 }
 
 export interface Stats {

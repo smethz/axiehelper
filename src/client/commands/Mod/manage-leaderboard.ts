@@ -1,5 +1,4 @@
 import { getPlayerProfile } from "@apis/game-api/getPlayerProfile"
-import { resolveProfile } from "@apis/ronin-rest/resolveProfile"
 import { createErrorEmbed } from "@client/components/embeds"
 import { DEFAULT_IDLE_TIME, MAX_LEADERBOARD_PLAYERS } from "@constants/index"
 import { CommandExecuteParams, SlashCommand, TranslateFunction } from "@custom-types/command"
@@ -16,6 +15,7 @@ import {
 } from "@utils/dbFunctions"
 import { isAPIError } from "@utils/isAPIError"
 import { isFulfilled } from "@utils/promiseHandler"
+import { resolveProfile } from "@utils/resolveProfile"
 import { trimStringInBack } from "@utils/trimString"
 import { determineAddress } from "@utils/validateAddress"
 import {
