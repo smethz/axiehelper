@@ -7,7 +7,7 @@
 			"description": "Ronin Address or User ID"
 		}
 	},
-	"profile_title": "{{name}}'s Profile",
+	"profile_title": "Player Profile",
 	"ronin_address": "Ronin Address",
 	"user_id": "User ID",
 	"errors": {
