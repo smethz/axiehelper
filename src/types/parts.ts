@@ -1,3 +1,5 @@
+import { ParsedCard } from "./card"
+
 export interface Part {
 	part_id: string
 	class: Class
@@ -6,7 +8,7 @@ export interface Part {
 	name: string
 	ability_id: string
 	skin?: number
-	originCard: OriginCard
+	originCard: ParsedCard
 }
 
 export enum Class {
@@ -16,28 +18,6 @@ export enum Class {
 	Bug = "bug",
 	Plant = "plant",
 	Reptile = "reptile",
-}
-
-export interface OriginCard {
-	id: string
-	cardId: string
-	partClass: PartClass
-	partType: PartType
-	partValue: string
-	class: Class
-	type: Type
-	cardName: string
-	description: string
-	defaultEnergy: number
-	defaultAttack: number
-	defaultDefense: number
-	healing: number
-	abilityType: AbilityType
-	level: number
-	tags: Tag[]
-	specialGenes: SpecialGenes
-	partId: string
-	name: string
 }
 
 export enum AbilityType {
@@ -53,6 +33,9 @@ export enum PartClass {
 	Beast = "Beast",
 	Bird = "Bird",
 	Bug = "Bug",
+	Dawn = "Dawn",
+	Dusk = "Dusk",
+	Mech = "Mech",
 	Plant = "Plant",
 	Reptile = "Reptile",
 }
