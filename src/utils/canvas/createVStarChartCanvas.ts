@@ -14,7 +14,7 @@ const chartJSNodeCanvas = new ChartJSNodeCanvas({
 
 export async function createVStarChartCanvas(playerBattles: ParsedPlayerBattles): Promise<Buffer> {
 	const vstarList = playerBattles.battles
-		.filter((battle) => battle.player.rewards?.new_vstar !== undefined)
+		.filter((battle) => battle.player.rewards?.new_vstar !== undefined && battle.battle_type_string !== "blitz_pvp")
 		.filter((_, index) => (index + 1) % 2 === 0)
 		.map((battle) => {
 			return {
