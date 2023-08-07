@@ -1,5 +1,5 @@
 export const GetPublicProfileWithRoninAddress = `
- query PublicProfileWithRoninAddress {
+ query PublicProfileWithRoninAddress($roninAddress: String!) {
   publicProfileWithRoninAddress(
     roninAddress: $roninAddress
   ) {

@@ -6,8 +6,10 @@ import { parseAddress } from "@utils/parsers"
 import logger from "pino-logger"
 
 interface APIPublicProfileWithRoninAddress {
-	publicProfileWithRoninAddress: {
-		accountId: string
+	data: {
+		publicProfileWithRoninAddress: {
+			accountId: string
+		}
 	}
 }
 
@@ -29,7 +31,7 @@ export async function getPublicProfileWithRoninAddress(
 		},
 	})
 		.then((response) => {
-			return response.data?.publicProfileWithRoninAddress?.accountId
+			return response.data.data?.publicProfileWithRoninAddress?.accountId
 		})
 		.catch((error) => logger.error(error, `MarketplaceAPI Error: getPublicProfileWithRoninAddress`))
 
